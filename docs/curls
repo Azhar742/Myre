@@ -1,0 +1,148 @@
+User Endpoints: 
+    1. create user:
+    curl -X POST http://localhost:5000/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_name": "John Doe",
+    "user_email": "john.doe@example.com",
+    "user_password": "password123",
+    "user_role": "admin",
+    "user_status": "active",
+    "company_name": "Acme Corp",
+    "company_id": 1
+  }'
+    
+    2. get user:
+    curl -X GET http://localhost:5000/users/1
+
+    3. update user:
+    curl -X PUT http://localhost:5000/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_name": "John Doe",
+    "user_email": "john.doe@example.com",
+    "user_password": "password123",
+    "user_role": "admin",
+    "user_status": "active",
+    "company_id": 1
+  }'
+
+    4. delete user:
+    curl -X DELETE http://localhost:5000/users/1
+
+
+Account Endpoints:
+    1. create account:
+    curl -X POST http://localhost:5000/accounts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_name": "Test Company",
+    "account_id": "ACC001",
+    "client_account_id": "CLI001",
+    "client_email": "client@test.com",
+    "client_phn": "1234567890",
+    "last_paid_bill_amount": 500.00,
+    "account_status": "active",
+    "company_name": "Test Corp",
+    "domain": "test.com",
+    "plan_name": "Enterprise"
+  }'
+
+    2. get account:
+    curl -X GET http://localhost:5000/accounts/1
+
+    3. update account:
+    curl -X PUT http://localhost:5000/accounts/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "account_status": "inactive",
+    "plan_name": "Basic"
+  }'
+
+    4. delete account:
+    curl -X DELETE http://localhost:5000/accounts/1
+
+    5. get all available account fields:
+    curl -X GET http://localhost:5000/accounts/fields
+
+    6. get populated fields for specific account:
+    curl -X GET http://localhost:5000/accounts/1/fields
+
+    7. get available filter fields for account (priority condition):
+    curl -X GET http://localhost:5000/priority_condition/1
+
+
+Priority Condition Endpoints:
+    1. create priority condition with filter rules (High Value Active):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "High Value Active Customers",
+    "description": "Customers with bill > 100 and active status",
+    "filter_conditions": {
+      "account_status": {"operator": "==", "value": "active"},
+      "last_paid_bill_amount": {"operator": ">", "value": 100}
+    },
+    "created_by": 1
+  }'
+
+    2. get accounts matching condition 1 (High Value Active):
+    curl -X GET http://localhost:5000/priority_accounts/1
+
+    3. create priority condition (Enterprise plan only):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "Enterprise Customers",
+    "filter_conditions": {
+      "plan_name": {"operator": "==", "value": "Enterprise"}
+    }
+  }'
+
+    4. get accounts matching condition 2 (Enterprise):
+    curl -X GET http://localhost:5000/priority_accounts/2
+
+    5. create priority condition (Low bill amount):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "Low Value Customers",
+    "description": "Customers with bill < 100",
+    "filter_conditions": {
+      "last_paid_bill_amount": {"operator": "<", "value": 100}
+    }
+  }'
+
+    6. create priority condition (Multiple conditions):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "Active Enterprise High Value",
+    "description": "Active Enterprise customers with bill >= 200",
+    "filter_conditions": {
+      "account_status": {"operator": "==", "value": "active"},
+      "plan_name": {"operator": "==", "value": "Enterprise"},
+      "last_paid_bill_amount": {"operator": ">=", "value": 200}
+    }
+  }'
+
+    7. create priority condition (Suspended accounts):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "Suspended Accounts",
+    "filter_conditions": {
+      "account_status": {"operator": "==", "value": "suspended"}
+    }
+  }'
+
+    8. create priority condition (Pro or Enterprise plans):
+    curl -X POST http://localhost:5000/priority_condition/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "condition_name": "Premium Plans",
+    "description": "Pro or Enterprise plan customers",
+    "filter_conditions": {
+      "plan_name": {"operator": "in", "value": ["Pro", "Enterprise"]}
+    }
+  }'

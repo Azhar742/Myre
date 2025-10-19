@@ -1,1 +1,0 @@
-# Myre Project

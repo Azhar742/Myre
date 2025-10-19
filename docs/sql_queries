@@ -1,0 +1,13 @@
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_name TEXT NOT NULL,
+    user_email TEXT NOT NULL UNIQUE,
+    user_password TEXT NOT NULL,
+    user_role TEXT DEFAULT 'user',
+    user_status TEXT DEFAULT 'active',
+    user_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user_deleted_at DATETIME DEFAULT NULL,
+    company_name TEXT,
+    company_id INTEGER
+);
