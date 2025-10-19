@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CRM — Dashboard</title>
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --sidebar:#0f1724;
+      --muted:#9aa4b2;
+      --accent:#2563eb;
+      --white:#fff;
+      --radius:10px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:#0b1220;height:100vh;display:flex;align-items:stretch}
+    .app{
+      display:flex;
+      width:100%;
+      min-height:100vh;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:260px;
+      background:linear-gradient(180deg,var(--sidebar),#071022 120%);
+      color:var(--white);
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      transition:width .22s ease;
+    }
+    .brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:18px}
+    .brand .logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+    nav{display:flex;flex-direction:column;gap:6px}
+    .menu-item{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius:8px;
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      cursor:pointer;
+      user-select:none;
+      font-size:14px;
+    }
+    .menu-item:hover{background:rgba(255,255,255,0.04)}
+    .menu-item .icon{width:22px;display:inline-flex;align-items:center;justify-content:center;opacity:0.95}
+    .menu-item.active{background:rgba(255,255,255,0.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02)}
+    .spacer{flex:1}
+
+    /* Main area */
+    .main{
+      flex:1;
+      padding:28px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      overflow:auto;
+    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .page-title{font-size:20px;font-weight:600}
+    .card{
+      background:var(--white);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:0 6px 18px rgba(11,17,32,0.06);
+    }
+
+    /* Responsive */
+    @media (max-width:800px){
+      .sidebar{position:fixed;left:-320px;top:0;bottom:0;z-index:40;height:100vh}
+      .sidebar.open{left:0}
+      .main{padding:16px}
+      .hamburger{display:inline-flex}
+    }
+    .hamburger{display:none;align-items:center;gap:8px;padding:8px;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
+    .hamburger .bar{width:18px;height:2px;background:currentColor;border-radius:2px}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main menu">
+      <div class="brand">
+        <div class="logo">CRM</div>
+        <div>Myre CRM</div>
+      </div>
+
+      <nav role="navigation" aria-label="Primary">
+        <a class="menu-item active" data-section="dashboard" href="#dashboard" role="link">
+          <span class="icon" aria-hidden>🏠</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="menu-item" data-section="accounts" href="#accounts" role="link">
+          <span class="icon" aria-hidden>👥</span>
+          <span>Account Management</span>
+        </a>
+
+        <a class="menu-item" data-section="automation" href="#automation" role="link">
+          <span class="icon" aria-hidden>⚙️</span>
+          <span>Automation</span>
+        </a>
+
+        <a class="menu-item" data-section="integration" href="#integration" role="link">
+          <span class="icon" aria-hidden>🔗</span>
+          <span>Integration</span>
+        </a>
+      </nav>
+
+      <div class="spacer" aria-hidden></div>
+
+      <div style="font-size:13px;color:rgba(255,255,255,0.75)">
+        v1.0 • <span style="color:var(--muted)">Signed in as</span><br/><strong>user@example.com</strong>
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="topbar">
+        <div class="left-controls" style="display:flex;align-items:center;gap:12px">
+          <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </button>
+          <div class="page-title" id="pageTitle">Dashboard</div>
+        </div>
+        <div style="color:var(--muted);font-size:14px">Welcome back</div>
+      </div>
+
+      <section id="content">
+        <div class="card" id="dashboard">
+          <h2 style="margin:0 0 8px">Overview</h2>
+          <p style="margin:0;color:var(--muted)">Quick stats and recent activity.</p>
+        </div>
+
+        <div class="card" id="accounts" style="display:none;margin-top:14px">
+          <h2 style="margin:0 0 8px">Account Management</h2>
+          <p style="margin:0;color:var(--muted)">Create, edit and manage customer accounts.</p>
+        </div>
+
+        <div class="card" id="automation" style="display:none;margin-top:14px">
+          <h2 style="margin:0 0 8px">Automation</h2>
+          <p style="margin:0;color:var(--muted)">Workflows, triggers and campaign automation.</p>
+        </div>
+
+        <div class="card" id="integration" style="display:none;margin-top:14px">
+          <h2 style="margin:0 0 8px">Integration</h2>
+          <p style="margin:0;color:var(--muted)">Connect third-party services and APIs.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+const sidebar = document.getElementById('sidebar');
+const hamburger = document.getElementById('hamburger');
+const items = document.querySelectorAll('.menu-item');
+const pageTitle = document.getElementById('pageTitle');
+
+function showSection(name) {
+  ['dashboard', 'accounts', 'automation', 'integration'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = (id === name) ? '' : 'none';
+  });
+
+  pageTitle.textContent = name.charAt(0).toUpperCase() + name.slice(1).replace(/s$/, '');
+  items.forEach(i => i.classList.toggle('active', i.dataset.section === name));
+
+  // close sidebar on small screens
+  if (window.matchMedia('(max-width:800px)').matches) {
+    sidebar.classList.remove('open');
+  }
+
+  // When "accounts" is clicked, generate only the table
+  if (name === 'accounts') {
+    createAccountsTable();
+  }
+}
+
+function createAccountsTable() {
+  const accountSection = document.getElementById('accounts');
+  accountSection.innerHTML = ''; // Clear previous content
+
+  // Create 10x10 table
+  const table = document.createElement('table');
+  table.border = '1';
+  table.style.borderCollapse = 'collapse';
+  table.style.width = '100%';
+  table.style.marginTop = '20px';
+
+  for (let row = 0; row < 10; row++) {
+    const tr = document.createElement('tr');
+    for (let col = 0; col < 10; col++) {
+      const td = document.createElement('td');
+      td.textContent = `R${row + 1}C${col + 1}`;
+      td.style.border = '1px solid #aaa';
+      td.style.padding = '8px';
+      td.style.textAlign = 'center';
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+
+  accountSection.appendChild(table);
+}
+
+items.forEach(item => {
+  item.addEventListener('click', e => {
+    e.preventDefault();
+    showSection(item.dataset.section);
+    history.replaceState({}, '', '#' + item.dataset.section);
+  });
+});
+
+hamburger?.addEventListener('click', () => sidebar.classList.toggle('open'));
+
+// open based on URL hash
+const hash = (location.hash || '#dashboard').replace('#', '');
+showSection(['dashboard', 'accounts', 'automation', 'integration'].includes(hash) ? hash : 'dashboard');
+
+
+document.addEventListener('click', e => {
+  if (window.matchMedia('(max-width:800px)').matches) {
+    if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
+  </script>
+</body>
+</html>
