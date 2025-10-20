@@ -18,6 +18,10 @@ class User(db.Model):
     user_deleted_at = db.Column(db.DateTime, nullable=True, index=True)
     company_name = db.Column(db.String(150), nullable=True)
     company_id = db.Column(db.Integer, nullable=True, index=True)
+    
+    # Multi-tenant organization fields
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True, index=True)
+    is_org_admin = db.Column(db.Boolean, default=False, index=True)  # Organization admin flag
 
     # Define composite indexes
     __table_args__ = (
@@ -26,6 +30,8 @@ class User(db.Model):
         Index('idx_users_deleted_at', 'user_deleted_at'),
         Index('idx_users_company_active', 'company_id', 'user_deleted_at'),
         Index('idx_users_role', 'user_role'),
+        Index('idx_users_organization', 'organization_id'),
+        Index('idx_users_org_admin', 'organization_id', 'is_org_admin'),
     )
 
     def __repr__(self):

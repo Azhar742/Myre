@@ -1,0 +1,397 @@
+/* ============================================
+   APPLE-INSPIRED THEME FOR MYRE
+   Add this CSS file to any page for Apple-style design
+   ============================================ */
+
+:root {
+    /* Apple Color Palette */
+    --apple-blue: #0071e3;
+    --apple-blue-hover: #0077ed;
+    --apple-gray-dark: #1d1d1f;
+    --apple-gray-light: #f5f5f7;
+    --apple-gray-medium: #86868b;
+    --apple-white: #fbfbfd;
+    
+    /* Semantic Colors */
+    --primary: #0071e3;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff3b30;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --background: #ffffff;
+    --background-alt: #f5f5f7;
+    --border-color: #d2d2d7;
+    
+    /* Shadows (Apple-style subtle) */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   TYPOGRAPHY (SF Pro inspired)
+   ============================================ */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--text-primary);
+    background: var(--background);
+    line-height: 1.47059;
+    font-weight: 400;
+    letter-spacing: -0.022em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--text-primary);
+}
+
+/* ============================================
+   SIDEBAR (Apple-style)
+   ============================================ */
+
+.sidebar {
+    background: var(--apple-white) !important;
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+}
+
+.brand {
+    font-weight: 600 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--text-primary) !important;
+}
+
+.menu-item {
+    border-radius: 10px !important;
+    margin: 4px 12px !important;
+    padding: 10px 16px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-weight: 400 !important;
+    color: var(--text-primary) !important;
+}
+
+.menu-item:hover {
+    background: var(--background-alt) !important;
+    transform: translateX(2px);
+}
+
+.menu-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+    font-weight: 500 !important;
+}
+
+/* ============================================
+   CARDS (Apple-style glass effect)
+   ============================================ */
+
+.card {
+    background: var(--background) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 18px !important;
+    box-shadow: var(--shadow-md) !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg) !important;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   BUTTONS (Apple-style)
+   ============================================ */
+
+button, .btn {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
+    font-weight: 400 !important;
+    border-radius: 980px !important;
+    padding: 12px 24px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-size: 17px !important;
+    letter-spacing: -0.022em !important;
+}
+
+button:hover, .btn:hover {
+    transform: scale(1.02);
+}
+
+button:active, .btn:active {
+    transform: scale(0.98);
+}
+
+/* Primary Button */
+.btn-primary, button[type="submit"] {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.btn-primary:hover, button[type="submit"]:hover {
+    background: var(--apple-blue-hover) !important;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: var(--background-alt) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-secondary:hover {
+    background: #e8e8ed !important;
+}
+
+/* ============================================
+   TABLES (Apple-style)
+   ============================================ */
+
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+    width: 100% !important;
+}
+
+thead th {
+    background: var(--background-alt) !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    text-transform: none !important;
+    letter-spacing: -0.01em !important;
+    padding: 12px 16px !important;
+    border: none !important;
+}
+
+tbody tr {
+    background: var(--background) !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+}
+
+tbody tr:hover {
+    background: var(--background-alt) !important;
+    transform: scale(1.005);
+    box-shadow: var(--shadow-sm) !important;
+}
+
+tbody td {
+    padding: 16px !important;
+    border: none !important;
+    font-size: 15px !important;
+}
+
+tbody tr td:first-child {
+    border-top-left-radius: 12px !important;
+    border-bottom-left-radius: 12px !important;
+}
+
+tbody tr td:last-child {
+    border-top-right-radius: 12px !important;
+    border-bottom-right-radius: 12px !important;
+}
+
+/* ============================================
+   FORMS (Apple-style)
+   ============================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif !important;
+    font-size: 17px !important;
+    padding: 12px 16px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 10px !important;
+    background: var(--background) !important;
+    transition: all 0.2s ease !important;
+    color: var(--text-primary) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1) !important;
+}
+
+label {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* ============================================
+   BADGES & STATUS (Apple-style)
+   ============================================ */
+
+.badge, span[style*="padding:4px"] {
+    border-radius: 6px !important;
+    padding: 4px 10px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* ============================================
+   MODALS (Apple-style)
+   ============================================ */
+
+.modal, div[id*="Modal"] {
+    backdrop-filter: blur(20px) !important;
+}
+
+.modal-content, div[id*="Modal"] > div {
+    border-radius: 20px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--border-color) !important;
+    animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================
+   NAVIGATION (Apple-style)
+   ============================================ */
+
+.topbar, .top-nav {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: saturate(180%) blur(20px) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+}
+
+.nav-link, a {
+    color: var(--text-primary) !important;
+    text-decoration: none !important;
+    font-weight: 400 !important;
+    transition: color 0.2s ease !important;
+}
+
+.nav-link:hover, a:hover {
+    color: var(--primary) !important;
+}
+
+/* ============================================
+   SCROLLBAR (Apple-style)
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--apple-gray-medium);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* ============================================
+   ANIMATIONS (Apple-style smooth)
+   ============================================ */
+
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.apple-text-primary {
+    color: var(--text-primary) !important;
+}
+
+.apple-text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.apple-bg-primary {
+    background: var(--primary) !important;
+}
+
+.apple-bg-light {
+    background: var(--background-alt) !important;
+}
+
+.apple-shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.apple-shadow-md {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.apple-shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.apple-rounded {
+    border-radius: 18px !important;
+}
+
+.apple-rounded-sm {
+    border-radius: 10px !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .card {
+        border-radius: 14px !important;
+        padding: 16px !important;
+    }
+    
+    button, .btn {
+        padding: 10px 20px !important;
+        font-size: 15px !important;
+    }
+}

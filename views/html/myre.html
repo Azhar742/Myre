@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Dashboard</title>
+    <title>CSM Dashboard</title>
+    <link rel="stylesheet" href="/static/css/apple_theme.css">
     <style>
         * {
             margin: 0;
@@ -584,7 +585,7 @@
     <div class="auth-container" id="loginPage">
         <div class="auth-box">
             <div class="auth-header">
-                <div class="auth-logo">CRM Dashboard</div>
+                <div class="auth-logo">CSM Dashboard</div>
                 <p class="auth-subtitle">Sign in to continue to your account</p>
             </div>
 
@@ -626,7 +627,7 @@
 
                 <div class="demo-credentials">
                     <p><strong>Demo Credentials:</strong></p>
-                    <p>Email: demo@crm.com</p>
+                    <p>Email: demo@csm.com</p>
                     <p>Password: demo123</p>
                 </div>
 
@@ -641,7 +642,7 @@
     <div class="auth-container hidden" id="signupPage">
         <div class="auth-box">
             <div class="auth-header">
-                <div class="auth-logo">CRM Dashboard</div>
+                <div class="auth-logo">CSM Dashboard</div>
                 <p class="auth-subtitle">Create your account to get started</p>
             </div>
 
@@ -715,7 +716,7 @@
     <!-- Dashboard -->
     <div class="dashboard" id="dashboardPage">
         <nav class="navbar">
-            <div class="logo">CRM Dashboard</div>
+            <div class="logo">CSM Dashboard</div>
             <div class="nav-right">
                 <span style="font-size: 14px; color: var(--text-secondary);" id="userEmail">Admin Panel</span>
                 
@@ -869,7 +870,7 @@
 
         // Store registered users
         let registeredUsers = [
-            { email: 'demo@crm.com', password: 'demo123', firstName: 'Demo', lastName: 'User' }
+            { email: 'demo@csm.com', password: 'demo123', firstName: 'Demo', lastName: 'User' }
         ];
 
         function renderLogs(containerId, data) {

@@ -4,21 +4,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CRM — Dashboard</title>
+  <title>CSM — Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/apple_theme.css') }}">
 </head>
 <body>
   <div class="app" id="app">
     <aside class="sidebar" id="sidebar" aria-label="Main menu">
       <div class="brand">
-        <div class="logo">CRM</div>
-        <div>Myre CRM</div>
+        <div class="logo">CSM</div>
+        <div>Myre CSM</div>
       </div>
 
       <nav role="navigation" aria-label="Primary">
-        <a class="menu-item {% if active_section == 'dashboard' %}active{% endif %}" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
+        <a class="menu-item {% if active_section == 'dashboard' %}active{% endif %}" href="/dashboard/{{ user_id }}" role="link">
           <span class="icon" aria-hidden>🏠</span>
           <span>Dashboard</span>
+        </a>
+
+        <a class="menu-item {% if active_section == 'priority' %}active{% endif %}" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
+          <span class="icon" aria-hidden>⭐</span>
+          <span>Priority Accounts</span>
         </a>
 
         <a class="menu-item {% if active_section == 'accounts' %}active{% endif %}" href="/account_management_dashboard/{{ user_id }}" role="link">
@@ -39,9 +45,14 @@
 
       <div class="spacer" aria-hidden></div>
 
-      <div style="font-size:13px;color:rgba(255,255,255,0.75)">
+      <div style="font-size:13px;color:rgba(255,255,255,0.75);padding:16px 0">
         v1.0 • <span style="color:var(--muted)">Signed in as</span><br/><strong>user@example.com</strong>
       </div>
+
+      <a class="menu-item" href="#" onclick="logout(); return false;" role="link" style="color:#ff6b6b;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px">
+        <span class="icon" aria-hidden>🚪</span>
+        <span>Logout</span>
+      </a>
     </aside>
 
     <main class="main" id="main">
@@ -108,7 +119,11 @@
               <tbody>
                 {% for account in accounts %}
                 <tr style="border-bottom:1px solid #e9ecef;">
-                  <td style="padding:12px 8px;font-weight:500;">{{ account.account_name }}</td>
+                  <td style="padding:12px 8px;font-weight:500;">
+                    <a href="#" class="account-link" data-account-id="{{ account.id }}" style="color:var(--accent);text-decoration:none;cursor:pointer;">
+                      {{ account.account_name }}
+                    </a>
+                  </td>
                   <td style="padding:12px 8px;">
                     {% if account.account_status == 'active' %}
                     <span style="padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#d4edda;color:#155724;">
@@ -127,7 +142,13 @@
                   <td style="padding:12px 8px;">{{ account.plan_name }}</td>
                   <td style="padding:12px 8px;color:var(--accent);">{{ account.client_email }}</td>
                   <td style="padding:12px 8px;color:var(--muted);">{{ account.client_phn }}</td>
-                  <td style="padding:12px 8px;font-weight:500;">${{ "%.2f"|format(account.last_paid_bill_amount) }}</td>
+                  <td style="padding:12px 8px;font-weight:500;">
+                    {% if account.last_paid_bill_amount is not none %}
+                      ${{ "%.2f"|format(account.last_paid_bill_amount) }}
+                    {% else %}
+                      <span style="color:var(--muted);">N/A</span>
+                    {% endif %}
+                  </td>
                   <td style="padding:12px 8px;">{{ account.company_name }}</td>
                   <td style="padding:12px 8px;color:var(--muted);">{{ account.domain }}</td>
                 </tr>
@@ -242,6 +263,146 @@
     </div>
   </div>
 
+  <!-- Account Details Modal -->
+  <div id="accountModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+      <div style="padding:24px;border-bottom:1px solid #e9ecef;display:flex;justify-content:space-between;align-items:center;">
+        <h2 style="margin:0;font-size:20px;font-weight:600;">Account Details</h2>
+        <button onclick="closeAccountModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#6c757d;">&times;</button>
+      </div>
+      <div id="accountDetailsContent" style="padding:24px;">
+        <div style="text-align:center;padding:40px;color:#6c757d;">Loading...</div>
+      </div>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+  <script>
+    // Logout function
+    function logout() {
+      // Clear any stored session data
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Redirect to home/login page
+      window.location.replace('/');
+    }
+
+    // Show account details modal
+    async function showAccountDetails(accountId) {
+      const modal = document.getElementById('accountModal');
+      const content = document.getElementById('accountDetailsContent');
+      
+      // Show modal
+      modal.style.display = 'flex';
+      
+      // Show loading
+      content.innerHTML = '<div style="text-align:center;padding:40px;color:#6c757d;">Loading...</div>';
+      
+      try {
+        // Fetch account details
+        const response = await fetch(`/account/${accountId}`);
+        const account = await response.json();
+        
+        if (response.ok) {
+          // Display account details
+          content.innerHTML = `
+            <div style="display:grid;gap:16px;">
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Account Name:</strong>
+                <span>${account.account_name || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Account ID:</strong>
+                <span>${account.account_id || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Client Account ID:</strong>
+                <span>${account.client_account_id || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Status:</strong>
+                <span style="padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;background:${account.account_status === 'active' ? '#d4edda' : '#f8d7da'};color:${account.account_status === 'active' ? '#155724' : '#721c24'};">
+                  ${(account.account_status || 'unknown').toUpperCase()}
+                </span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Company:</strong>
+                <span>${account.company_name || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Domain:</strong>
+                <span>${account.domain || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Plan:</strong>
+                <span>${account.plan_name || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Email:</strong>
+                <span style="color:var(--accent);">${account.client_email || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Phone:</strong>
+                <span>${account.client_phn || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Last Bill Amount:</strong>
+                <span style="font-weight:600;">${account.last_paid_bill_amount ? '$' + parseFloat(account.last_paid_bill_amount).toFixed(2) : 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Last Bill Date:</strong>
+                <span>${account.last_paid_bill_date || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Next Due Date:</strong>
+                <span>${account.next_due_date || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Last Interaction:</strong>
+                <span>${account.last_meaningful_interaction || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;">
+                <strong>Last Updated:</strong>
+                <span>${account.last_updated || 'N/A'}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+                <strong>Last Login:</strong>
+                <span>${account.last_login || 'N/A'}</span>
+              </div>
+            </div>
+          `;
+        } else {
+          content.innerHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">Failed to load account details</div>';
+        }
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+        content.innerHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">Error loading account details</div>';
+      }
+    }
+
+    // Close account modal
+    function closeAccountModal() {
+      document.getElementById('accountModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('accountModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeAccountModal();
+      }
+    });
+
+    // Add click event listeners to all account links
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.account-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const accountId = this.getAttribute('data-account-id');
+          showAccountDetails(accountId);
+        });
+      });
+    });
+  </script>
 </body>
 </html>

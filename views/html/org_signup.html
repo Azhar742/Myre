@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Sign Up - Myre</title>
+    <link rel="stylesheet" href="/static/css/org_signup.css">
+    <link rel="stylesheet" href="/static/css/apple_theme.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="nav-brand">Myre</div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/login" class="nav-link">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="signup-container">
+        <!-- Left Side - Branding -->
+        <div class="branding-section">
+            <div class="branding-content">
+                <h1 class="brand-logo">Myre</h1>
+                <h2 class="brand-tagline">Empower Your Team</h2>
+                <p class="brand-description">
+                    Join thousands of organizations using Myre to manage customer relationships, 
+                    automate workflows, and drive growth.
+                </p>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Multi-user collaboration</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Advanced priority management</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Real-time analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>Secure & scalable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Signup Form -->
+        <div class="form-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Create Your Organization</h2>
+                    <p>Get started with a free account. No credit card required.</p>
+                </div>
+
+                <form id="orgSignupForm" class="signup-form">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Organization</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Admin Account</div>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Plan</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Organization Details -->
+                    <div class="form-step active" id="step1">
+                        <h3 class="step-title">Organization Information</h3>
+                        
+                        <div class="form-group">
+                            <label for="orgName">Organization Name *</label>
+                            <input type="text" id="orgName" name="orgName" required 
+                                   placeholder="Acme Corporation">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="orgEmail">Organization Email *</label>
+                            <input type="email" id="orgEmail" name="orgEmail" required 
+                                   placeholder="contact@acme.com">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="orgPhone">Phone Number</label>
+                                <input type="tel" id="orgPhone" name="orgPhone" 
+                                       placeholder="+1 (555) 123-4567">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orgWebsite">Website</label>
+                                <input type="url" id="orgWebsite" name="orgWebsite" 
+                                       placeholder="https://acme.com">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="orgIndustry">Industry</label>
+                                <select id="orgIndustry" name="orgIndustry">
+                                    <option value="">Select Industry</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="retail">Retail</option>
+                                    <option value="manufacturing">Manufacturing</option>
+                                    <option value="education">Education</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="orgSize">Company Size</label>
+                                <select id="orgSize" name="orgSize">
+                                    <option value="">Select Size</option>
+                                    <option value="1-10">1-10 employees</option>
+                                    <option value="11-50">11-50 employees</option>
+                                    <option value="51-200">51-200 employees</option>
+                                    <option value="201-500">201-500 employees</option>
+                                    <option value="500+">500+ employees</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-next" onclick="nextStep(2)">
+                            Next: Admin Account →
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Admin Account -->
+                    <div class="form-step" id="step2">
+                        <h3 class="step-title">Create Admin Account</h3>
+                        
+                        <div class="form-group">
+                            <label for="adminName">Full Name *</label>
+                            <input type="text" id="adminName" name="adminName" required 
+                                   placeholder="John Doe">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminEmail">Email Address *</label>
+                            <input type="email" id="adminEmail" name="adminEmail" required 
+                                   placeholder="john@acme.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminPassword">Password *</label>
+                            <input type="password" id="adminPassword" name="adminPassword" required 
+                                   placeholder="Minimum 8 characters">
+                            <div class="password-strength" id="passwordStrength"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminPasswordConfirm">Confirm Password *</label>
+                            <input type="password" id="adminPasswordConfirm" name="adminPasswordConfirm" required 
+                                   placeholder="Re-enter password">
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
+                                ← Back
+                            </button>
+                            <button type="button" class="btn btn-primary btn-next" onclick="nextStep(3)">
+                                Next: Choose Plan →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Plan Selection -->
+                    <div class="form-step" id="step3">
+                        <h3 class="step-title">Choose Your Plan</h3>
+                        
+                        <div class="plans-container">
+                            <div class="plan-card" data-plan="free">
+                                <div class="plan-badge">Free</div>
+                                <h4 class="plan-name">Starter</h4>
+                                <div class="plan-price">
+                                    <span class="price">$0</span>
+                                    <span class="period">/month</span>
+                                </div>
+                                <ul class="plan-features">
+                                    <li>Unlimited users</li>
+                                    <li>Unlimited accounts</li>
+                                    <li>Basic priority rules</li>
+                                    <li>Email support</li>
+                                </ul>
+                                <button type="button" class="btn btn-plan" onclick="selectPlan('free')">
+                                    Select Free
+                                </button>
+                            </div>
+
+                            <div class="plan-card featured" data-plan="basic">
+                                <div class="plan-badge popular">Most Popular</div>
+                                <h4 class="plan-name">Basic</h4>
+                                <div class="plan-price">
+                                    <span class="price">$29</span>
+                                    <span class="period">/month</span>
+                                </div>
+                                <ul class="plan-features">
+                                    <li>Unlimited users</li>
+                                    <li>Unlimited accounts</li>
+                                    <li>Advanced automation</li>
+                                    <li>Priority support</li>
+                                </ul>
+                                <button type="button" class="btn btn-plan btn-primary" onclick="selectPlan('basic')">
+                                    Select Basic
+                                </button>
+                            </div>
+
+                            <div class="plan-card" data-plan="pro">
+                                <div class="plan-badge">Pro</div>
+                                <h4 class="plan-name">Professional</h4>
+                                <div class="plan-price">
+                                    <span class="price">$99</span>
+                                    <span class="period">/month</span>
+                                </div>
+                                <ul class="plan-features">
+                                    <li>Unlimited users</li>
+                                    <li>Unlimited accounts</li>
+                                    <li>Custom integrations</li>
+                                    <li>24/7 support</li>
+                                </ul>
+                                <button type="button" class="btn btn-plan" onclick="selectPlan('pro')">
+                                    Select Pro
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="selectedPlan" name="selectedPlan" value="free">
+
+                        <div class="form-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
+                                ← Back
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                Create Organization
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="/">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2>Welcome to Myre!</h2>
+            <p>Your organization has been created successfully.</p>
+            <p class="redirect-message">Redirecting to your dashboard...</p>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content error">
+            <div class="error-icon">✕</div>
+            <h2>Oops! Something went wrong</h2>
+            <p id="errorMessage">Please try again.</p>
+            <button class="btn btn-primary" onclick="closeErrorModal()">Try Again</button>
+        </div>
+    </div>
+
+    <script src="/static/js/org_signup.js"></script>
+</body>
+</html>

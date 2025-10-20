@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employee - Myre</title>
+    <link rel="stylesheet" href="/static/css/add_employee.css">
+    <link rel="stylesheet" href="/static/css/apple_theme.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div class="nav-brand">Myre</div>
+            <div class="nav-links">
+                <a href="#" onclick="goToDashboard()" class="nav-link">Dashboard</a>
+                <a href="#" onclick="viewOrganization()" class="nav-link">Organization</a>
+                <a href="#" onclick="logout()" class="nav-link logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="header">
+            <h1>Add Team Member</h1>
+            <p>Invite a new employee to join your organization</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="form-card">
+                <form id="addEmployeeForm">
+                    <div class="form-group">
+                        <label for="userName">Full Name *</label>
+                        <input type="text" id="userName" name="userName" required 
+                               placeholder="Jane Smith">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userEmail">Email Address *</label>
+                        <input type="email" id="userEmail" name="userEmail" required 
+                               placeholder="jane.smith@company.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userPassword">Temporary Password *</label>
+                        <input type="password" id="userPassword" name="userPassword" required 
+                               placeholder="Minimum 8 characters">
+                        <small class="help-text">User will be prompted to change this on first login</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="userRole">Role *</label>
+                        <select id="userRole" name="userRole" required>
+                            <option value="csm">CSM (Customer Success Manager)</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="isOrgAdmin" name="isOrgAdmin">
+                            <span>Grant organization admin privileges</span>
+                        </label>
+                        <small class="help-text">Admins can manage users and organization settings</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="goBack()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Employee</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="info-card">
+                <h3>Organization Limits</h3>
+                <div class="limit-info" id="limitsInfo">
+                    <div class="limit-item">
+                        <span class="limit-label">Current Users:</span>
+                        <span class="limit-value" id="currentUsers">-</span>
+                    </div>
+                    <div class="limit-item" id="maxUsersItem">
+                        <span class="limit-label">Maximum Users:</span>
+                        <span class="limit-value" id="maxUsers">-</span>
+                    </div>
+                    <div class="limit-item" id="availableSlotsItem">
+                        <span class="limit-label">Available Slots:</span>
+                        <span class="limit-value" id="availableSlots">-</span>
+                    </div>
+                </div>
+                
+                <div class="plan-info">
+                    <p><strong>Current Plan:</strong> <span id="currentPlan">-</span></p>
+                    <p class="upgrade-text">Need more users? <a href="#" onclick="upgradePlan()">Upgrade your plan</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="success-icon">✓</div>
+            <h2>Employee Added Successfully!</h2>
+            <p id="successMessage">The new team member has been added to your organization.</p>
+            <button class="btn btn-primary" onclick="closeSuccessModal()">Done</button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content error">
+            <div class="error-icon">✕</div>
+            <h2>Failed to Add Employee</h2>
+            <p id="errorMessage">Please try again.</p>
+            <button class="btn btn-primary" onclick="closeErrorModal()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Get organization ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const orgId = urlParams.get('org_id');
+
+        // Load organization stats on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (orgId) {
+                await loadOrganizationStats();
+            }
+        });
+
+        async function loadOrganizationStats() {
+            try {
+                const response = await fetch(`/organization/${orgId}/stats`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('currentUsers').textContent = data.active_users;
+                    
+                    // Handle unlimited users (when max_users is null)
+                    if (data.max_users === null) {
+                        document.getElementById('maxUsers').textContent = 'Unlimited';
+                        document.getElementById('availableSlots').textContent = 'Unlimited';
+                        document.getElementById('maxUsersItem').style.display = 'none';
+                        document.getElementById('availableSlotsItem').style.display = 'none';
+                    } else {
+                        document.getElementById('maxUsers').textContent = data.max_users;
+                        document.getElementById('availableSlots').textContent = data.users_remaining;
+                        
+                        // Disable form if at limit
+                        if (data.users_remaining <= 0) {
+                            document.getElementById('addEmployeeForm').innerHTML = 
+                                '<div class="alert alert-warning">Your organization has reached the maximum user limit. Please upgrade your plan to add more users.</div>';
+                        }
+                    }
+                    
+                    document.getElementById('currentPlan').textContent = 
+                        data.organization.subscription_plan.charAt(0).toUpperCase() + 
+                        data.organization.subscription_plan.slice(1);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Form submission
+        document.getElementById('addEmployeeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!orgId) {
+                showErrorModal('Organization ID is missing');
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+
+            const formData = {
+                user_name: document.getElementById('userName').value.trim(),
+                user_email: document.getElementById('userEmail').value.trim(),
+                user_password: document.getElementById('userPassword').value,
+                user_role: document.getElementById('userRole').value,
+                is_org_admin: document.getElementById('isOrgAdmin').checked
+            };
+
+            try {
+                const response = await fetch(`/organization/${orgId}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccessModal(`${data.user.name} has been added to your organization.`);
+                    document.getElementById('addEmployeeForm').reset();
+                    await loadOrganizationStats(); // Refresh stats
+                } else {
+                    throw new Error(data.error || 'Failed to add employee');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorModal(error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        function showSuccessModal(message) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
+        }
+
+        function showErrorModal(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').classList.add('show');
+        }
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.remove('show');
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function upgradePlan() {
+            alert('Upgrade plan functionality coming soon!');
+        }
+
+        function goToDashboard() {
+            // Get user ID from session/storage or URL
+            const userId = localStorage.getItem('user_id') || 1;
+            window.location.href = `/csm_dashboard/${userId}`;
+        }
+
+        function viewOrganization() {
+            if (orgId) {
+                window.location.href = `/organization/${orgId}`;
+            } else {
+                alert('Organization ID not found');
+            }
+        }
+
+        function logout() {
+            // Clear any stored session data
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Redirect to home/login page
+            window.location.replace('/');
+        }
+    </script>
+</body>
+</html>

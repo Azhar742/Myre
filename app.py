@@ -15,6 +15,7 @@ db.init_app(app)
 # Import ALL models before db.create_all()
 from models.account_model import Account
 from models.priority_condition_model import PriorityCondition
+from models.organization_model import Organization
 
 # Import utilities and controllers
 from utils.utils import serialize_account
@@ -37,6 +38,16 @@ from controllers.priority_condition_controller import (
     get_all_priority_conditions_service,
     get_accounts_by_user_priority_conditions_service
 )
+from controllers.organization_controller import (
+    create_organization_service,
+    get_organization_service,
+    get_organization_by_slug_service,
+    update_organization_service,
+    delete_organization_service,
+    add_user_to_organization_service,
+    get_organization_users_service,
+    get_organization_stats_service
+)
 
 
 # Initialize DB and create tables
@@ -47,12 +58,162 @@ with app.app_context():
 
 @app.route('/', methods=['GET'])
 def home():
+    """Landing page - renders login/signup page"""
     return render_template('html/myre_new.html')
+
+
+# --- Organization Routes ---
+
+@app.route('/organization/signup', methods=['GET'])
+def organization_signup_page():
+    """Render organization signup page"""
+    return render_template('html/org_signup.html')
+
+
+@app.route('/organization/signup', methods=['POST'])
+def organization_signup():
+    """Create new organization with admin user"""
+    data = request.get_json()
+    
+    org_data = data.get('organization', {})
+    admin_data = data.get('admin', {})
+    
+    if not org_data or not admin_data:
+        return jsonify({'error': 'Organization and admin data are required'}), 400
+    
+    # Create organization and admin user
+    organization, admin_user = create_organization_service(org_data, admin_data)
+    
+    if not organization or not admin_user:
+        return jsonify({'error': 'Failed to create organization. Email may already exist.'}), 400
+    
+    return jsonify({
+        'message': 'Organization created successfully',
+        'organization': organization.to_dict(),
+        'admin_user': {
+            'id': admin_user.id,
+            'name': admin_user.user_name,
+            'email': admin_user.user_email,
+            'role': admin_user.user_role,
+            'is_org_admin': admin_user.is_org_admin
+        }
+    }), 201
+
+
+@app.route('/organization/<int:org_id>', methods=['GET'])
+def get_organization(org_id):
+    """Get organization details by ID"""
+    organization = get_organization_service(org_id)
+    
+    if not organization:
+        return jsonify({'error': 'Organization not found'}), 404
+    
+    return jsonify(organization.to_dict())
+
+
+@app.route('/organization/<int:org_id>', methods=['PUT'])
+def update_organization(org_id):
+    """Update organization details"""
+    data = request.get_json()
+    
+    organization = update_organization_service(org_id, data)
+    
+    if not organization:
+        return jsonify({'error': 'Organization not found'}), 404
+    
+    return jsonify({
+        'message': 'Organization updated successfully',
+        'organization': organization.to_dict()
+    })
+
+
+@app.route('/organization/<int:org_id>', methods=['DELETE'])
+def delete_organization(org_id):
+    """Soft delete organization and all users"""
+    success = delete_organization_service(org_id)
+    
+    if not success:
+        return jsonify({'error': 'Organization not found'}), 404
+    
+    return jsonify({'message': 'Organization deleted successfully'})
+
+
+@app.route('/organization/<int:org_id>/users', methods=['GET'])
+def get_organization_users(org_id):
+    """Get all users in an organization"""
+    users = get_organization_users_service(org_id)
+    
+    return jsonify({
+        'organization_id': org_id,
+        'total_users': len(users),
+        'users': [{
+            'id': user.id,
+            'name': user.user_name,
+            'email': user.user_email,
+            'role': user.user_role,
+            'is_org_admin': user.is_org_admin,
+            'status': user.user_status,
+            'created_at': user.user_created_at.isoformat() if user.user_created_at else None
+        } for user in users]
+    })
+
+
+@app.route('/organization/<int:org_id>/users', methods=['POST'])
+def add_organization_user(org_id):
+    """Add a new user/employee to organization"""
+    data = request.get_json()
+    
+    if not data.get('user_email') or not data.get('user_name') or not data.get('user_password'):
+        return jsonify({'error': 'User name, email, and password are required'}), 400
+    
+    new_user = add_user_to_organization_service(org_id, data)
+    
+    if not new_user:
+        return jsonify({'error': 'Failed to add user. Organization may be at user limit or email already exists.'}), 400
+    
+    return jsonify({
+        'message': 'User added successfully',
+        'user': {
+            'id': new_user.id,
+            'name': new_user.user_name,
+            'email': new_user.user_email,
+            'role': new_user.user_role,
+            'is_org_admin': new_user.is_org_admin
+        }
+    }), 201
+
+
+@app.route('/organization/<int:org_id>/stats', methods=['GET'])
+def get_organization_stats(org_id):
+    """Get organization statistics (users, accounts, limits)"""
+    stats = get_organization_stats_service(org_id)
+    
+    if not stats:
+        return jsonify({'error': 'Organization not found'}), 404
+    
+    return jsonify(stats)
+
+
+@app.route('/organization/slug/<slug>', methods=['GET'])
+def get_organization_by_slug(slug):
+    """Get organization by slug"""
+    organization = get_organization_by_slug_service(slug)
+    
+    if not organization:
+        return jsonify({'error': 'Organization not found'}), 404
+    
+    return jsonify(organization.to_dict())
+
+
+@app.route('/organization/add_employee', methods=['GET'])
+def add_employee_page():
+    """Render add employee page"""
+    return render_template('html/add_employee.html')
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    """Login endpoint - authenticate user"""
+    """Authenticate user with email and password"""
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -77,14 +238,29 @@ def login():
             'id': user.id,
             'name': user.user_name,
             'email': user.user_email,
-            'role': user.user_role
+            'role': user.user_role,
+            'organization_id': user.organization_id,
+            'is_org_admin': user.is_org_admin
         }
     }), 200
 
 
+@app.route('/logout', methods=['POST', 'GET'])
+def logout():
+    """Logout user (clear session)"""
+    # In a real app with sessions, you would clear the session here
+    # session.clear()
+    
+    if request.method == 'POST':
+        return jsonify({'message': 'Logged out successfully'}), 200
+    else:
+        # Redirect to home page for GET requests
+        return render_template('html/myre_new.html')
+
+
 @app.route('/signup', methods=['POST'])
 def signup():
-    """Signup endpoint - create new user"""
+    """Create new user account with default CSM role"""
     data = request.get_json()
     
     name = data.get('name')
@@ -122,14 +298,61 @@ def signup():
 
 @app.route('/csm_dashboard/<int:user_id>', methods=['GET'])
 def csm_dashboard(user_id):
-    """CSM Dashboard landing page after login"""
+    """Render simple CSM dashboard showing user ID"""
     return render_template('html/csm_dashboard_simple.html', user_id=user_id)
 
 
-@app.route('/account_management/<int:user_id>', methods=['GET'])
+@app.route('/account_management_dashboard/<int:user_id>', methods=['GET'])
+def account_management_dashboard(user_id):
+    """Account management selection page"""
+    # Get user
+    user = User.query.get(user_id)
+    if not user:
+        return "User not found", 404
+    
+    # Get account stats
+    all_accounts = Account.query.filter_by(csm_user_id=user_id).all()
+    active_accounts = Account.query.filter_by(csm_user_id=user_id, account_status='active').all()
+    
+    # Get priority accounts count
+    priority_result = get_accounts_by_user_priority_conditions_service(user_id)
+    priority_count = priority_result.get('total_unique_accounts', 0) if priority_result else 0
+    
+    return render_template('html/account_management.html',
+                         user_id=user_id,
+                         user_email=user.user_email,
+                         total_accounts=len(all_accounts),
+                         active_accounts=len(active_accounts),
+                         priority_count=priority_count)
+
+
+@app.route('/dashboard/<int:user_id>', methods=['GET'])
+def dashboard(user_id):
+    """Main dashboard with graphs and stats"""
+    # Get user
+    user = User.query.get(user_id)
+    if not user:
+        return "User not found", 404
+    
+    # Get all accounts for this user
+    all_accounts = Account.query.filter_by(csm_user_id=user_id).all()
+    active_accounts = Account.query.filter_by(csm_user_id=user_id, account_status='active').all()
+    
+    # Get priority accounts count
+    priority_result = get_accounts_by_user_priority_conditions_service(user_id)
+    priority_count = priority_result.get('total_unique_accounts', 0) if priority_result else 0
+    
+    return render_template('html/dashboard.html',
+                         user_id=user_id,
+                         user_email=user.user_email,
+                         total_accounts=len(all_accounts),
+                         active_accounts=len(active_accounts),
+                         priority_accounts=priority_count)
+
+
 @app.route('/priority_accounts_dashboard/<int:user_id>', methods=['GET'])
 def priority_accounts_dashboard(user_id):
-    """Render dashboard with priority accounts for a specific user"""
+    """Render priority accounts dashboard with rules and filtered accounts for user"""
     result = get_accounts_by_user_priority_conditions_service(user_id)
     
     if result is None:
@@ -154,34 +377,20 @@ def priority_accounts_dashboard(user_id):
                          active_section='dashboard')
 
 
-@app.route('/account_management_dashboard/<int:user_id>', methods=['GET'])
-def account_management_dashboard(user_id):
-    """Render account management dashboard for a specific user"""
-    result = get_accounts_by_user_priority_conditions_service(user_id)
+@app.route('/account/<int:account_id>', methods=['GET'])
+def get_account_details(account_id):
+    """Get account details by ID"""
+    account = Account.query.get(account_id)
     
-    if result is None:
-        result = {
-            'user_id': user_id,
-            'total_conditions': 0,
-            'conditions': [],
-            'total_unique_accounts': 0,
-            'accounts': []
-        }
+    if not account:
+        return jsonify({'error': 'Account not found'}), 404
     
-    accounts = [serialize_account(account) for account in result.get('accounts', [])]
-    
-    return render_template('html/index.html', 
-                         user_id=user_id,
-                         accounts=accounts,
-                         conditions=result.get('conditions', []),
-                         total_conditions=result.get('total_conditions', 0),
-                         total_accounts=result.get('total_unique_accounts', 0),
-                         active_section='accounts')
+    return jsonify(serialize_account(account)), 200
 
 
 @app.route('/priority_accounts_dashboard/<int:user_id>/automation', methods=['GET'])
 def automation_view(user_id):
-    """Render automation view for a specific user"""
+    """Render automation section of dashboard for user"""
     result = get_accounts_by_user_priority_conditions_service(user_id)
     
     if result is None:
@@ -206,7 +415,7 @@ def automation_view(user_id):
 
 @app.route('/priority_accounts_dashboard/<int:user_id>/integration', methods=['GET'])
 def integration_view(user_id):
-    """Render integration view for a specific user"""
+    """Render integration section of dashboard for user"""
     result = get_accounts_by_user_priority_conditions_service(user_id)
     
     if result is None:
@@ -232,7 +441,7 @@ def integration_view(user_id):
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    """Route to create a new user - handles request/response only"""
+    """Create new user via API"""
     data = request.get_json()
     
     # Call controller service to handle business logic
@@ -243,7 +452,7 @@ def create_user():
 
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_user(user_id):
-    """Route to get a user by ID - handles request/response only"""
+    """Get user details by ID"""
     # Call controller service to handle business logic
     user = get_user_service(user_id)
     
@@ -262,7 +471,7 @@ def get_user(user_id):
 
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
-    """Route to update a user - handles request/response only"""
+    """Update user information by ID"""
     data = request.get_json()
     
     # Call controller service to handle business logic
@@ -276,7 +485,7 @@ def update_user(user_id):
 
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    """Route to delete a user - handles request/response only"""
+    """Soft delete user by ID"""
     # Call controller service to handle business logic
     success = delete_user_service(user_id)
     
@@ -290,7 +499,7 @@ def delete_user(user_id):
 
 @app.route('/accounts', methods=['POST'])
 def create_account_route():
-    """Route to create a new account - handles request/response only"""
+    """Create new customer account"""
     data = request.get_json()
     
     account = create_account_service(data)
@@ -300,10 +509,7 @@ def create_account_route():
 
 @app.route('/accounts/<int:account_id>/fields', methods=['GET'])
 def get_account_populated_fields_route(account_id):
-    """
-    Get all field names that are populated (non-null) for a specific account.
-    This is useful for understanding what data is available for filtering.
-    """
+    """Get all non-null field names for an account (useful for building filters)"""
     fields = get_account_filter_conditions(account_id)
     
     if fields is None:
@@ -318,7 +524,7 @@ def get_account_populated_fields_route(account_id):
 
 @app.route('/accounts/<int:account_id>', methods=['GET'])
 def get_account_route(account_id):
-    """Route to get an account by ID - handles request/response only"""
+    """Get account details by ID"""
     account = get_account_service(account_id)
     
     if not account:
@@ -329,7 +535,7 @@ def get_account_route(account_id):
 
 @app.route('/accounts/<int:account_id>', methods=['PUT'])
 def update_account_route(account_id):
-    """Route to update an account - handles request/response only"""
+    """Update account information by ID"""
     data = request.get_json()
     
     account = update_account_service(account_id, data)
@@ -342,7 +548,7 @@ def update_account_route(account_id):
 
 @app.route('/accounts/<int:account_id>', methods=['DELETE'])
 def delete_account_route(account_id):
-    """Route to delete an account - handles request/response only"""
+    """Delete account by ID"""
     # Call controller service to handle business logic
     success = delete_account_service(account_id)
     
@@ -355,10 +561,7 @@ def delete_account_route(account_id):
 # --- Priority Condition Routes ---
 @app.route('/priority_conditions/<int:user_id>', methods=['GET'])
 def get_priority_condition_accounts_by_user_route(user_id):
-    """
-    Get priority conditions created by a specific user with their details.
-    Returns the conditions in a structured format.
-    """
+    """Get all priority rules created by a specific user"""
     from controllers.priority_condition_controller import get_priority_conditions_by_user_service
     
     conditions = get_priority_conditions_by_user_service(user_id)
@@ -381,10 +584,7 @@ def get_priority_condition_accounts_by_user_route(user_id):
 
 @app.route('/priority_conditions_all', methods=['GET'])
 def get_all_priority_conditions_route():
-    """
-    Get all priority conditions.
-    Returns all priority conditions with their filter rules.
-    """
+    """Get all priority rules across all users"""
     conditions = PriorityCondition.query.all()
     
     result = [condition.to_dict() for condition in conditions]
@@ -397,7 +597,7 @@ def get_all_priority_conditions_route():
 
 @app.route('/priority_condition/<int:account_id>', methods=['GET'])
 def get_priority_condition_fields_route(account_id):
-    """Get populated field names for an account to use as filter conditions"""
+    """Get available filter fields for an account (same as /accounts/<id>/fields)"""
     fields = get_account_filter_conditions(account_id)
     
     if fields is None:
@@ -410,21 +610,7 @@ def get_priority_condition_fields_route(account_id):
     
 @app.route('/priority_condition', methods=['POST'])
 def create_priority_condition_direct():
-    """
-    Create a new priority condition with filter rules directly.
-    
-    Expected JSON:
-    {
-        "condition_name": "High Value Customers",
-        "description": "Customers with high revenue",
-        "filter_conditions": {
-            "account_status": {"operator": "==", "value": "active"},
-            "last_paid_bill_amount": {"operator": ">", "value": 1000}
-        },
-        "client_account_id": 1,  // Optional - for reference purposes
-        "created_by": 1
-    }
-    """
+    """Create priority rule with filter conditions (requires: condition_name, filter_conditions, created_by)"""
     data = request.get_json()
     
     if not data.get('filter_conditions'):
@@ -452,19 +638,7 @@ def create_priority_condition_direct():
 
 @app.route('/priority_condition/<int:condition_id>', methods=['PUT'])
 def update_priority_condition_route(condition_id):
-    """
-    Update an existing priority condition.
-    
-    Expected JSON:
-    {
-        "condition_name": "Updated Rule Name",
-        "description": "Updated description",
-        "filter_conditions": {
-            "account_status": {"operator": "==", "value": "active"}
-        },
-        "is_active": true
-    }
-    """
+    """Update priority rule (name, description, filters, or active status)"""
     data = request.get_json()
     
     condition = PriorityCondition.query.get(condition_id)
@@ -494,7 +668,7 @@ def update_priority_condition_route(condition_id):
 
 @app.route('/priority_condition/<int:condition_id>', methods=['DELETE'])
 def delete_priority_condition_route(condition_id):
-    """Delete a priority condition"""
+    """Delete priority rule by ID"""
     condition = PriorityCondition.query.get(condition_id)
     if not condition:
         return jsonify({'error': 'Priority condition not found'}), 404
@@ -507,20 +681,7 @@ def delete_priority_condition_route(condition_id):
 
 @app.route('/priority_condition/<int:account_id>', methods=['POST'])
 def create_priority_condition_route(account_id):
-    """
-    Create a new priority condition with filter rules based on a reference account.
-    
-    Request body example:
-    {
-        "condition_name": "High Value Customers",
-        "description": "Customers with bill > 100 and active status",
-        "filter_conditions": {
-            "account_status": {"operator": "==", "value": "active"},
-            "last_paid_bill_amount": {"operator": ">", "value": 100}
-        },
-        "created_by": 1
-    }
-    """
+    """Create priority rule using account_id as reference (legacy endpoint)"""
     data = request.get_json()
     
     priority_condition = create_priority_condition_service(account_id, data)
@@ -538,10 +699,7 @@ def create_priority_condition_route(account_id):
 
 @app.route('/priority_accounts/<int:condition_id>', methods=['GET'])
 def get_priority_accounts_route(condition_id):
-    """
-    Get all accounts that match the filter conditions of a priority condition.
-    This applies all the stored filter rules (e.g., bill_amount > 100, status == active)
-    """
+    """Get all accounts matching a priority rule's filter conditions"""
     accounts = get_priority_accounts_service(condition_id)
     
     if accounts is None:

@@ -3,7 +3,7 @@ Authentication Endpoints:
     curl -X POST http://localhost:5000/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "demo@crm.com",
+    "email": "demo@csm.com",
     "password": "demo123"
   }'
 

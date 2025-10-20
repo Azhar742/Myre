@@ -22,6 +22,9 @@ class Account(db.Model):
     
     # CSM user who manages this account
     csm_user_id = db.Column(db.Integer, nullable=True)
+    
+    # Multi-tenant: Organization that owns this customer account
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True, index=True)
 
     company_name = db.Column(db.String(150), nullable=True)
     domain = db.Column(db.String(150), nullable=True)

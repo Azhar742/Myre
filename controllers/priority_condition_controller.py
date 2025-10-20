@@ -196,21 +196,30 @@ def get_priority_accounts_service(condition_id, user_id=None):
         operator = condition_rule.get('operator', '==')
         value = condition_rule.get('value')
         
-        # Apply the operator
+        # Convert value to appropriate type if needed
+        if value is not None:
+            try:
+                # Try to convert to float for numeric comparisons
+                if operator in ['>', '>=', '<', '<=']:
+                    value = float(value)
+            except (ValueError, TypeError):
+                pass
+        
+        # Apply the operator with null handling
         if operator == '==':
             query = query.filter(column == value)
         elif operator == '!=':
             query = query.filter(column != value)
         elif operator == '>':
-            query = query.filter(column > value)
+            query = query.filter(column != None).filter(column > value)
         elif operator == '>=':
-            query = query.filter(column >= value)
+            query = query.filter(column != None).filter(column >= value)
         elif operator == '<':
-            query = query.filter(column < value)
+            query = query.filter(column != None).filter(column < value)
         elif operator == '<=':
-            query = query.filter(column <= value)
+            query = query.filter(column != None).filter(column <= value)
         elif operator == 'like':
-            query = query.filter(column.like(f"%{value}%"))
+            query = query.filter(column != None).filter(column.like(f"%{value}%"))
         elif operator == 'in':
             query = query.filter(column.in_(value))
         elif operator == 'not_in':

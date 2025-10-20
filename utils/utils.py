@@ -3,6 +3,7 @@ def serialize_account(account):
         return dt.isoformat() if dt else None
 
     return {
+        'id': account.id,
         'account_name': account.account_name,
         'account_id': account.account_id,
         'client_account_id': account.client_account_id,
