@@ -69,3 +69,10 @@ Thumbs.db
 
 # pyenv
 .python-version
+
+# Test files (optional)
+test_app.py
+test_script.py
+
+# Database
+mydatabase.db

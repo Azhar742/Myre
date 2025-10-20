@@ -75,9 +75,6 @@ def get_user(user_id):
         'user_email': user.user_email,
         'user_role': user.user_role,
         'user_status': user.user_status,
-        'user_created_at': user.user_created_at.isoformat(),
-        'user_updated_at': user.user_updated_at.isoformat(),
-        'company_name': user.company_name,
         'company_id': user.company_id
     })
 
@@ -240,3 +237,5 @@ def get_priority_accounts_route(condition_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
