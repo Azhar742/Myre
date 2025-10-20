@@ -1,8 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import os
 
 # Initialize Flask app first
-app = Flask(__name__)
+app = Flask(__name__, template_folder='views', static_folder='views', static_url_path='/static')
 # Use absolute path to ensure database is in project root
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "mydatabase.db")}'
@@ -33,7 +33,9 @@ from controllers.account_controller import (
 from controllers.priority_condition_controller import (
     get_account_filter_conditions,
     create_priority_condition_service,
-    get_priority_accounts_service
+    get_priority_accounts_service,
+    get_all_priority_conditions_service,
+    get_accounts_by_user_priority_conditions_service
 )
 
 
@@ -45,7 +47,132 @@ with app.app_context():
 
 @app.route('/', methods=['GET'])
 def home():
-    return 'Hello, World!'
+    return render_template('html/myre_new.html')
+
+
+@app.route('/csm_dashboard/<int:user_id>', methods=['GET'])
+def csm_dashboard(user_id):
+    """CSM Dashboard landing page after login"""
+    # Get stats for the dashboard
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        result = {
+            'user_id': user_id,
+            'total_conditions': 0,
+            'total_unique_accounts': 0
+        }
+    
+    return render_template('html/csm_dashboard.html',
+                         user_id=user_id,
+                         user_name='CSM User',
+                         user_initials='CU',
+                         total_priority_accounts=result.get('total_unique_accounts', 0),
+                         total_conditions=result.get('total_conditions', 0),
+                         active_users=0,
+                         integrations=0)
+
+
+@app.route('/priority_accounts_dashboard/<int:user_id>', methods=['GET'])
+def priority_accounts_dashboard(user_id):
+    """Render dashboard with priority accounts for a specific user"""
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        # Return empty data if no conditions found
+        result = {
+            'user_id': user_id,
+            'total_conditions': 0,
+            'conditions': [],
+            'total_unique_accounts': 0,
+            'accounts': []
+        }
+    
+    # Serialize accounts for template
+    accounts = [serialize_account(account) for account in result.get('accounts', [])]
+    
+    return render_template('html/index.html', 
+                         user_id=user_id,
+                         accounts=accounts,
+                         conditions=result.get('conditions', []),
+                         total_conditions=result.get('total_conditions', 0),
+                         total_accounts=result.get('total_unique_accounts', 0),
+                         active_section='dashboard')
+
+
+@app.route('/account_management_dashboard/<int:user_id>', methods=['GET'])
+def account_management_dashboard(user_id):
+    """Render account management dashboard for a specific user"""
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        result = {
+            'user_id': user_id,
+            'total_conditions': 0,
+            'conditions': [],
+            'total_unique_accounts': 0,
+            'accounts': []
+        }
+    
+    accounts = [serialize_account(account) for account in result.get('accounts', [])]
+    
+    return render_template('html/index.html', 
+                         user_id=user_id,
+                         accounts=accounts,
+                         conditions=result.get('conditions', []),
+                         total_conditions=result.get('total_conditions', 0),
+                         total_accounts=result.get('total_unique_accounts', 0),
+                         active_section='accounts')
+
+
+@app.route('/priority_accounts_dashboard/<int:user_id>/automation', methods=['GET'])
+def automation_view(user_id):
+    """Render automation view for a specific user"""
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        result = {
+            'user_id': user_id,
+            'total_conditions': 0,
+            'conditions': [],
+            'total_unique_accounts': 0,
+            'accounts': []
+        }
+    
+    accounts = [serialize_account(account) for account in result.get('accounts', [])]
+    
+    return render_template('html/index.html', 
+                         user_id=user_id,
+                         accounts=accounts,
+                         conditions=result.get('conditions', []),
+                         total_conditions=result.get('total_conditions', 0),
+                         total_accounts=result.get('total_unique_accounts', 0),
+                         active_section='automation')
+
+
+@app.route('/priority_accounts_dashboard/<int:user_id>/integration', methods=['GET'])
+def integration_view(user_id):
+    """Render integration view for a specific user"""
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        result = {
+            'user_id': user_id,
+            'total_conditions': 0,
+            'conditions': [],
+            'total_unique_accounts': 0,
+            'accounts': []
+        }
+    
+    accounts = [serialize_account(account) for account in result.get('accounts', [])]
+    
+    return render_template('html/index.html', 
+                         user_id=user_id,
+                         accounts=accounts,
+                         conditions=result.get('conditions', []),
+                         total_conditions=result.get('total_conditions', 0),
+                         total_accounts=result.get('total_unique_accounts', 0),
+                         active_section='integration')
 
 # --- User Routes ---
 
@@ -172,6 +299,46 @@ def delete_account_route(account_id):
 
 
 # --- Priority Condition Routes ---
+@app.route('/priority_conditions/<int:user_id>', methods=['GET'])
+def get_priority_condition_accounts_by_user_route(user_id):
+    """
+    Get all accounts that match priority conditions created by a specific user.
+    This returns all conditions created by the user and the accounts matching those conditions.
+    """
+    result = get_accounts_by_user_priority_conditions_service(user_id)
+    
+    if result is None:
+        return jsonify({'message': 'No priority conditions found for this user'}), 404
+    
+    # Serialize accounts
+    from utils.utils import serialize_account
+    result['accounts'] = [serialize_account(account) for account in result['accounts']]
+    
+    return jsonify(result)
+
+@app.route('/priority_conditions_all', methods=['GET'])
+def get_all_priority_conditions_route():
+    """
+    Get all priority conditions.
+    Returns a list of all priority conditions with their details.
+    """
+    conditions = get_all_priority_conditions_service()
+    
+    return jsonify({
+        'total_conditions': len(conditions),
+        'conditions': [{
+            'id': condition.id,
+            'condition_name': condition.condition_name,
+            'description': condition.description,
+            'reference_account_id': condition.reference_account_id,
+            'is_active': condition.is_active,
+            'filter_conditions': condition.get_filter_conditions(),
+            'created_by': condition.created_by,
+            'created_at': condition.created_at.isoformat() if condition.created_at else None,
+            'updated_at': condition.updated_at.isoformat() if condition.updated_at else None
+        } for condition in conditions]
+    })
+
 
 @app.route('/priority_condition/<int:account_id>', methods=['GET'])
 def get_priority_condition_fields_route(account_id):

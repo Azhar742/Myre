@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CSM Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/csm_dashboard.css') }}">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <div class="logo-icon">CRM</div>
+          <span class="logo-text">Myre CRM</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <span class="user-name">{{ user_name or 'CSM User' }}</span>
+          <div class="user-avatar">{{ user_initials or 'CU' }}</div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome to CSM Dashboard</h1>
+        <p class="welcome-subtitle">Manage your customer success operations efficiently</p>
+      </div>
+
+      <!-- Dashboard Cards Grid -->
+      <div class="dashboard-grid">
+        <!-- Priority Account Management Card -->
+        <a href="/priority_accounts_dashboard/{{ user_id }}" class="dashboard-card">
+          <div class="card-icon priority-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">Priority Account Management</h2>
+            <p class="card-description">View and manage priority accounts based on custom conditions</p>
+            <div class="card-stats">
+              <span class="stat-badge">{{ total_priority_accounts or 0 }} Accounts</span>
+              <span class="stat-badge">{{ total_conditions or 0 }} Conditions</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <!-- User Account Management Card -->
+        <a href="/account_management_dashboard/{{ user_id }}" class="dashboard-card">
+          <div class="card-icon users-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">User Account Management</h2>
+            <p class="card-description">Manage user accounts, roles, and permissions</p>
+            <div class="card-stats">
+              <span class="stat-badge">Manage Users</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <!-- Automation Card -->
+        <a href="/priority_accounts_dashboard/{{ user_id }}/automation" class="dashboard-card">
+          <div class="card-icon automation-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">Automation</h2>
+            <p class="card-description">Set up workflows, triggers, and automated campaigns</p>
+            <div class="card-stats">
+              <span class="stat-badge">Configure Workflows</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <!-- Integration Card -->
+        <a href="/priority_accounts_dashboard/{{ user_id }}/integration" class="dashboard-card">
+          <div class="card-icon integration-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </div>
+          <div class="card-content">
+            <h2 class="card-title">Integration</h2>
+            <p class="card-description">Connect third-party services and manage API integrations</p>
+            <div class="card-stats">
+              <span class="stat-badge">Manage Integrations</span>
+            </div>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+      </div>
+
+      <!-- Quick Stats Section -->
+      <div class="quick-stats">
+        <h2 class="stats-title">Quick Overview</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value">{{ total_priority_accounts or 0 }}</div>
+            <div class="stat-label">Priority Accounts</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ total_conditions or 0 }}</div>
+            <div class="stat-label">Active Conditions</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ active_users or 0 }}</div>
+            <div class="stat-label">Active Users</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ integrations or 0 }}</div>
+            <div class="stat-label">Integrations</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/csm_dashboard.js') }}"></script>
+</body>
+</html>

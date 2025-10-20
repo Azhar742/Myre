@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        /* Theme Variables */
+        :root {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --accent-color: #667eea;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --hover-bg: #f5f5f5;
+            --card-shadow: rgba(0,0,0,0.05);
+        }
+
+        /* Light Theme */
+        body[data-theme="light"] {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --accent-color: #667eea;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --hover-bg: #f5f5f5;
+            --card-shadow: rgba(0,0,0,0.05);
+        }
+
+        /* Dark Theme */
+        body[data-theme="dark"] {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --accent-color: #667eea;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #0d0d0d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333333;
+            --hover-bg: #2a2a2a;
+            --card-shadow: rgba(0,0,0,0.3);
+        }
+
+        body {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Login/Signup Page Styles */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: var(--bg-primary);
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px var(--card-shadow);
+            width: 100%;
+            max-width: 420px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-logo {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .auth-link {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            background: var(--bg-primary);
+            padding: 0 16px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .demo-credentials {
+            background: var(--hover-bg);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .demo-credentials strong {
+            color: var(--text-primary);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+        }
+
+        .navbar {
+            background: var(--bg-primary);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px var(--card-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .theme-dropdown {
+            position: relative;
+        }
+
+        .theme-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+
+        .theme-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
+        .theme-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--card-shadow);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .theme-menu.show {
+            display: block;
+        }
+
+        .theme-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+            color: var(--text-primary);
+        }
+
+        .theme-option:hover {
+            background: var(--hover-bg);
+        }
+
+        .theme-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .theme-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .theme-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            color: var(--text-primary);
+        }
+
+        .logout-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--card-shadow);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--card-shadow);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .log-section {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .log-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .log-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .log-badge {
+            background: var(--hover-bg);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .log-body {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .log-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .log-message {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .log-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            color: var(--text-primary);
+        }
+
+        .refresh-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .show {
+            display: block !important;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Login Page -->
+    <div class="auth-container" id="loginPage">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">CRM Dashboard</div>
+                <p class="auth-subtitle">Sign in to continue to your account</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label" for="loginEmail">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        class="form-input" 
+                        placeholder="name@company.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        class="form-input" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="auth-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn">Sign In</button>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="demo-credentials">
+                    <p><strong>Demo Credentials:</strong></p>
+                    <p>Email: demo@crm.com</p>
+                    <p>Password: demo123</p>
+                </div>
+
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" class="auth-link" onclick="showSignup(event)">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div class="auth-container hidden" id="signupPage">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">CRM Dashboard</div>
+                <p class="auth-subtitle">Create your account to get started</p>
+            </div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="name-row">
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            class="form-input" 
+                            placeholder="John"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            class="form-input" 
+                            placeholder="Doe"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupEmail">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="signupEmail" 
+                        class="form-input" 
+                        placeholder="name@company.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="signupPassword" 
+                        class="form-input" 
+                        placeholder="Create a strong password"
+                        required
+                        minlength="6"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        class="form-input" 
+                        placeholder="Re-enter your password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="auth-btn">Create Account</button>
+
+                <div class="auth-switch">
+                    Already have an account? <a href="#" class="auth-link" onclick="showLogin(event)">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboardPage">
+        <nav class="navbar">
+            <div class="logo">CRM Dashboard</div>
+            <div class="nav-right">
+                <span style="font-size: 14px; color: var(--text-secondary);" id="userEmail">Admin Panel</span>
+                
+                <!-- Theme Dropdown -->
+                <div class="theme-dropdown">
+                    <button class="theme-btn" onclick="toggleThemeMenu()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                        Theme
+                    </button>
+                    <div class="theme-menu" id="themeMenu">
+                        <div class="theme-option" onclick="changeTheme('light')">
+                            <div class="theme-icon" style="background: #ffffff; border: 2px solid #e0e0e0;">
+                                ☀️
+                            </div>
+                            <span>Light Mode</span>
+                        </div>
+                        <div class="theme-option" onclick="changeTheme('dark')">
+                            <div class="theme-icon" style="background: #1a1a1a; border: 2px solid #333333;">
+                                🌙
+                            </div>
+                            <span>Dark Mode</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                <div class="user-avatar" id="userAvatar">JD</div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="header">
+                <h1>Activity Logs</h1>
+                <p>Real-time monitoring of system activities</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-value" id="totalEvents">247</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Users</div>
+                    <div class="stat-value" id="activeUsers">32</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value" id="successRate">98.5%</div>
+                </div>
+            </div>
+
+            <div class="logs-container">
+                <!-- User Activity Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            User Activity
+                            <span class="log-badge" id="userCount">12</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('user')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="userLogs"></div>
+                </div>
+
+                <!-- System Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <path d="M8 21h8M12 17v4"/>
+                            </svg>
+                            System Events
+                            <span class="log-badge" id="systemCount">8</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('system')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="systemLogs"></div>
+                </div>
+
+                <!-- Transaction Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3h18v18H3zM3 9h18M9 21V9"/>
+                            </svg>
+                            Transactions
+                            <span class="log-badge" id="transactionCount">15</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('transaction')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="transactionLogs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userLogsData = [
+            { time: '2 min ago', message: 'Sarah Johnson logged in', meta: 'IP: 192.168.1.45', status: 'success' },
+            { time: '5 min ago', message: 'Mike Davis updated profile', meta: 'Changes: Email, Phone', status: 'info' },
+            { time: '8 min ago', message: 'Emily Chen created new contact', meta: 'Contact ID: #C1247', status: 'success' },
+            { time: '12 min ago', message: 'Failed login attempt', meta: 'User: admin@company.com', status: 'error' },
+            { time: '15 min ago', message: 'Alex Martinez logged out', meta: 'Session: 2h 34m', status: 'info' },
+            { time: '18 min ago', message: 'Lisa Brown exported report', meta: 'Report: Q4-2024-Sales', status: 'success' },
+            { time: '22 min ago', message: 'John Smith deleted record', meta: 'Record ID: #R8923', status: 'warning' },
+            { time: '25 min ago', message: 'Kate Wilson logged in', meta: 'IP: 192.168.1.67', status: 'success' }
+        ];
+
+        const systemLogsData = [
+            { time: '1 min ago', message: 'Database backup completed', meta: 'Size: 2.4 GB', status: 'success' },
+            { time: '10 min ago', message: 'API rate limit warning', meta: 'Endpoint: /api/users', status: 'warning' },
+            { time: '15 min ago', message: 'SSL certificate renewed', meta: 'Valid until: Oct 2026', status: 'success' },
+            { time: '20 min ago', message: 'Cache cleared successfully', meta: 'Type: Redis', status: 'info' },
+            { time: '30 min ago', message: 'System update available', meta: 'Version: 2.4.1', status: 'info' },
+            { time: '35 min ago', message: 'High CPU usage detected', meta: 'Usage: 87%', status: 'error' },
+            { time: '40 min ago', message: 'Cron job executed', meta: 'Task: email_digest', status: 'success' },
+            { time: '45 min ago', message: 'Server restart completed', meta: 'Downtime: 12s', status: 'success' }
+        ];
+
+        const transactionLogsData = [
+            { time: '3 min ago', message: 'Payment processed', meta: 'Amount: $1,245.00 • Order #3421', status: 'success' },
+            { time: '7 min ago', message: 'Refund initiated', meta: 'Amount: $89.99 • Order #3418', status: 'warning' },
+            { time: '11 min ago', message: 'Invoice generated', meta: 'Invoice #INV-2024-1142', status: 'info' },
+            { time: '14 min ago', message: 'Payment failed', meta: 'Reason: Insufficient funds', status: 'error' },
+            { time: '19 min ago', message: 'Subscription renewed', meta: 'Plan: Premium • $49.99/mo', status: 'success' },
+            { time: '24 min ago', message: 'Chargeback received', meta: 'Amount: $120.00 • Order #3401', status: 'error' },
+            { time: '28 min ago', message: 'Payment processed', meta: 'Amount: $3,567.50 • Order #3420', status: 'success' },
+            { time: '32 min ago', message: 'Tax calculated', meta: 'Amount: $145.20 • Order #3419', status: 'info' }
+        ];
+
+        // Store registered users
+        let registeredUsers = [
+            { email: 'demo@crm.com', password: 'demo123', firstName: 'Demo', lastName: 'User' }
+        ];
+
+        function renderLogs(containerId, data) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = data.map(log => `
+                <div class="log-item">
+                    <div class="log-time">${log.time}</div>
+                    <div class="log-message">${log.message} <span class="status ${log.status}">${log.status}</span></div>
+                    <div class="log-meta">${log.meta}</div>
+                </div>
+            `).join('');
+        }
+
+        function refreshLogs(type) {
+            const btn = event.currentTarget;
+            btn.style.transform = 'rotate(360deg)';
+            btn.style.transition = 'transform 0.5s';
+            setTimeout(() => {
+                btn.style.transform = 'rotate(0deg)';
+            }, 500);
+            
+            if (type === 'user') {
+                renderLogs('userLogs', userLogsData);
+            } else if (type === 'system') {
+                renderLogs('systemLogs', systemLogsData);
+            } else if (type === 'transaction') {
+                renderLogs('transactionLogs', transactionLogsData);
+            }
+        }
+
+        function showSignup(event) {
+            event.preventDefault();
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('signupPage').classList.remove('hidden');
+        }
+
+        function showLogin(event) {
+            event.preventDefault();
+            document.getElementById('signupPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            // Check if user already exists
+            const userExists = registeredUsers.find(u => u.email === email);
+            if (userExists) {
+                alert('An account with this email already exists!');
+                return;
+            }
+
+            // Register new user
+            registeredUsers.push({
+                email: email,
+                password: password,
+                firstName: firstName,
+                lastName: lastName
+            });
+
+            alert('Account created successfully! Please sign in.');
+            
+            // Reset form and show login page
+            document.getElementById('signupForm').reset();
+            showLogin(event);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Validate credentials
+            const user = registeredUsers.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                alert('Invalid email or password!');
+                return;
+            }
+
+            // Hide login page, show dashboard
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.add('show');
+            
+            // Update user info in navbar
+            document.getElementById('userEmail').textContent = user.email;
+            
+            // Update avatar with initials
+            const initials = user.firstName.charAt(0) + user.lastName.charAt(0);
+            document.getElementById('userAvatar').textContent = initials.toUpperCase();
+            
+            // Initialize dashboard
+            renderLogs('userLogs', userLogsData);
+            renderLogs('systemLogs', systemLogsData);
+            renderLogs('transactionLogs', transactionLogsData);
+        }
+
+        function handleLogout() {
+            // Hide dashboard, show login page
+            document.getElementById('dashboardPage').classList.remove('show');
+            document.getElementById('loginPage').classList.remove('hidden');
+            
+            // Reset form
+            document.getElementById('loginForm').reset();
+        }
+
+        function toggleThemeMenu() {
+            const menu = document.getElementById('themeMenu');
+            menu.classList.toggle('show');
+        }
+
+        function changeTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            toggleThemeMenu();
+        }
+
+        // Close theme menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.theme-dropdown');
+            const menu = document.getElementById('themeMenu');
+            if (dropdown && !dropdown.contains(event.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

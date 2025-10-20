@@ -74,6 +74,80 @@ def create_priority_condition_service(account_id, data):
     return condition
 
 
+def get_all_priority_conditions_service():
+    """
+    Get all priority conditions.
+    
+    Returns:
+        List of all PriorityCondition objects
+    """
+    return PriorityCondition.query.all()
+
+
+def get_priority_conditions_by_user_service(user_id):
+    """
+    Get all priority conditions created by a specific user.
+    
+    Args:
+        user_id: ID of the user who created the conditions
+        
+    Returns:
+        List of PriorityCondition objects created by the user
+    """
+    return PriorityCondition.query.filter_by(created_by=user_id, is_active=True).all()
+
+
+def get_accounts_by_user_priority_conditions_service(user_id):
+    """
+    Get all accounts that match ANY priority condition created by a specific user.
+    
+    Args:
+        user_id: ID of the user who created the conditions
+        
+    Returns:
+        Dictionary with conditions and their matching accounts
+    """
+    # Get all priority conditions created by this user
+    conditions = get_priority_conditions_by_user_service(user_id)
+    
+    if not conditions:
+        return None
+    
+    # Collect all matching accounts for each condition
+    result = {
+        'user_id': user_id,
+        'total_conditions': len(conditions),
+        'conditions': []
+    }
+    
+    all_account_ids = set()
+    
+    for condition in conditions:
+        # Get accounts matching this condition
+        accounts = get_priority_accounts_service(condition.id)
+        
+        if accounts:
+            account_ids = [acc.id for acc in accounts]
+            all_account_ids.update(account_ids)
+            
+            result['conditions'].append({
+                'condition_id': condition.id,
+                'condition_name': condition.condition_name,
+                'description': condition.description,
+                'filter_conditions': condition.get_filter_conditions(),
+                'matching_accounts_count': len(accounts),
+                'matching_account_ids': account_ids
+            })
+    
+    # Get unique accounts
+    unique_accounts = Account.query.filter(Account.id.in_(all_account_ids)).all() if all_account_ids else []
+    
+    result['total_unique_accounts'] = len(unique_accounts)
+    result['accounts'] = unique_accounts
+    
+    return result
+
+
 def delete_priority_condition_service(condition_id):
     """Delete a priority condition"""
     condition = PriorityCondition.query.get(condition_id)

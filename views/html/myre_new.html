@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/myre.css') }}">
+</head>
+<body data-theme="light">
+    <!-- Login Page -->
+    <div class="auth-container" id="loginPage">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">CRM Dashboard</div>
+                <p class="auth-subtitle">Sign in to continue to your account</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label" for="loginEmail">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        class="form-input" 
+                        placeholder="name@company.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="loginPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        class="form-input" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="auth-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn">Sign In</button>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="demo-credentials">
+                    <p><strong>Demo Credentials:</strong></p>
+                    <p>Email: demo@crm.com</p>
+                    <p>Password: demo123</p>
+                </div>
+
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" class="auth-link" onclick="showSignup(event)">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Page -->
+    <div class="auth-container hidden" id="signupPage">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">CRM Dashboard</div>
+                <p class="auth-subtitle">Create your account to get started</p>
+            </div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="name-row">
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            class="form-input" 
+                            placeholder="John"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            class="form-input" 
+                            placeholder="Doe"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupEmail">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="signupEmail" 
+                        class="form-input" 
+                        placeholder="name@company.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="signupPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="signupPassword" 
+                        class="form-input" 
+                        placeholder="Create a strong password"
+                        required
+                        minlength="6"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        class="form-input" 
+                        placeholder="Re-enter your password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="auth-btn">Create Account</button>
+
+                <div class="auth-switch">
+                    Already have an account? <a href="#" class="auth-link" onclick="showLogin(event)">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboardPage">
+        <nav class="navbar">
+            <div class="logo">CRM Dashboard</div>
+            <div class="nav-right">
+                <span style="font-size: 14px; color: var(--text-secondary);" id="userEmail">Admin Panel</span>
+                
+                <!-- Theme Dropdown -->
+                <div class="theme-dropdown">
+                    <button class="theme-btn" onclick="toggleThemeMenu()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                        Theme
+                    </button>
+                    <div class="theme-menu" id="themeMenu">
+                        <div class="theme-option" onclick="changeTheme('light')">
+                            <div class="theme-icon" style="background: #ffffff; border: 2px solid #e0e0e0;">
+                                ☀️
+                            </div>
+                            <span>Light Mode</span>
+                        </div>
+                        <div class="theme-option" onclick="changeTheme('dark')">
+                            <div class="theme-icon" style="background: #1a1a1a; border: 2px solid #333333;">
+                                🌙
+                            </div>
+                            <span>Dark Mode</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                <div class="user-avatar" id="userAvatar">JD</div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="header">
+                <h1>Activity Logs</h1>
+                <p>Real-time monitoring of system activities</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Events</div>
+                    <div class="stat-value" id="totalEvents">247</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Users</div>
+                    <div class="stat-value" id="activeUsers">32</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value" id="successRate">98.5%</div>
+                </div>
+            </div>
+
+            <div class="logs-container">
+                <!-- User Activity Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            User Activity
+                            <span class="log-badge" id="userCount">12</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('user')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="userLogs"></div>
+                </div>
+
+                <!-- System Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <path d="M8 21h8M12 17v4"/>
+                            </svg>
+                            System Events
+                            <span class="log-badge" id="systemCount">8</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('system')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="systemLogs"></div>
+                </div>
+
+                <!-- Transaction Logs -->
+                <div class="log-section">
+                    <div class="log-header">
+                        <div class="log-title">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3h18v18H3zM3 9h18M9 21V9"/>
+                            </svg>
+                            Transactions
+                            <span class="log-badge" id="transactionCount">15</span>
+                        </div>
+                        <button class="refresh-btn" onclick="refreshLogs('transaction')">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="log-body" id="transactionLogs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/myre.js') }}"></script>
+</body>
+</html>

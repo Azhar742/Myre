@@ -2,6 +2,26 @@ Home Endpoint:
     1. home:
     curl -X GET http://localhost:5000/
 
+    2. CSM dashboard (landing page after login):
+    curl -X GET http://localhost:5000/csm_dashboard/1
+    # Or open in browser: http://localhost:5000/csm_dashboard/1
+
+    3. priority accounts dashboard (user ID 1):
+    curl -X GET http://localhost:5000/priority_accounts_dashboard/1
+    # Or open in browser: http://localhost:5000/priority_accounts_dashboard/1
+
+    4. account management dashboard (user ID 1):
+    curl -X GET http://localhost:5000/account_management_dashboard/1
+    # Or open in browser: http://localhost:5000/account_management_dashboard/1
+
+    5. automation view (user ID 1):
+    curl -X GET http://localhost:5000/priority_accounts_dashboard/1/automation
+    # Or open in browser: http://localhost:5000/priority_accounts_dashboard/1/automation
+
+    6. integration view (user ID 1):
+    curl -X GET http://localhost:5000/priority_accounts_dashboard/1/integration
+    # Or open in browser: http://localhost:5000/priority_accounts_dashboard/1/integration
+
 
 User Endpoints: 
     1. create user:
@@ -72,10 +92,16 @@ Account Endpoints:
 
 
 Priority Condition Endpoints:
-    1. get available filter fields for account (priority condition):
+    1. get priority accounts by user (all accounts matching user's conditions):
+    curl -X GET http://localhost:5000/priority_conditions/1
+
+    2. get all priority conditions:
+    curl -X GET http://localhost:5000/priority_conditions_all
+
+    3. get available filter fields for account (priority condition):
     curl -X GET http://localhost:5000/priority_condition/1
 
-    2. create priority condition with filter rules (High Value Active):
+    4. create priority condition with filter rules (High Value Active):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -88,10 +114,10 @@ Priority Condition Endpoints:
     "created_by": 1
   }'
 
-    3. get accounts matching condition 1 (High Value Active):
+    5. get accounts matching condition 1 (High Value Active):
     curl -X GET http://localhost:5000/priority_accounts/1
 
-    4. create priority condition (Enterprise plan only):
+    6. create priority condition (Enterprise plan only):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -101,10 +127,10 @@ Priority Condition Endpoints:
     }
   }'
 
-    5. get accounts matching condition 2 (Enterprise):
+    7. get accounts matching condition 2 (Enterprise):
     curl -X GET http://localhost:5000/priority_accounts/2
 
-    6. create priority condition (Low bill amount):
+    8. create priority condition (Low bill amount):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -115,7 +141,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    7. create priority condition (Multiple conditions):
+    9. create priority condition (Multiple conditions):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -128,7 +154,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    8. create priority condition (Suspended accounts):
+    10. create priority condition (Suspended accounts):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +164,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    9. create priority condition (Pro or Enterprise plans):
+    11. create priority condition (Pro or Enterprise plans):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{

@@ -1,0 +1,75 @@
+:root{
+  --bg:#f4f6fb;
+  --sidebar:#0f1724;
+  --muted:#9aa4b2;
+  --accent:#2563eb;
+  --white:#fff;
+  --radius:10px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#0b1220;height:100vh;display:flex;align-items:stretch}
+.app{
+  display:flex;
+  width:100%;
+  min-height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+  width:260px;
+  background:linear-gradient(180deg,var(--sidebar),#071022 120%);
+  color:var(--white);
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  transition:width .22s ease;
+}
+.brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:18px}
+.brand .logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+nav{display:flex;flex-direction:column;gap:6px}
+.menu-item{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:8px;
+  color:rgba(255,255,255,0.9);
+  text-decoration:none;
+  cursor:pointer;
+  user-select:none;
+  font-size:14px;
+}
+.menu-item:hover{background:rgba(255,255,255,0.04)}
+.menu-item .icon{width:22px;display:inline-flex;align-items:center;justify-content:center;opacity:0.95}
+.menu-item.active{background:rgba(255,255,255,0.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02)}
+.spacer{flex:1}
+
+/* Main area */
+.main{
+  flex:1;
+  padding:28px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  overflow:auto;
+}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.page-title{font-size:20px;font-weight:600}
+.card{
+  background:var(--white);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:0 6px 18px rgba(11,17,32,0.06);
+}
+
+/* Responsive */
+@media (max-width:800px){
+  .sidebar{position:fixed;left:-320px;top:0;bottom:0;z-index:40;height:100vh}
+  .sidebar.open{left:0}
+  .main{padding:16px}
+  .hamburger{display:inline-flex}
+}
+.hamburger{display:none;align-items:center;gap:8px;padding:8px;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
+.hamburger .bar{width:18px;height:2px;background:currentColor;border-radius:2px}
