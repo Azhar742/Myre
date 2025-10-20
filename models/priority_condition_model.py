@@ -11,7 +11,10 @@ class PriorityCondition(db.Model):
     condition_name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=True)
     
-    # Reference to the account this condition is based on
+    # Client account ID (optional - for reference purposes)
+    client_account_id = db.Column(db.Integer, nullable=True)
+    
+    # Also keep old column name for backward compatibility
     reference_account_id = db.Column(db.Integer, nullable=True)
     
     # Store filter conditions as JSON
@@ -38,3 +41,17 @@ class PriorityCondition(db.Model):
     def set_filter_conditions(self, conditions_dict):
         """Set filter conditions from dictionary"""
         self.filter_conditions = json.dumps(conditions_dict)
+    
+    def to_dict(self):
+        """Serialize priority condition to dictionary"""
+        return {
+            'id': self.id,
+            'condition_name': self.condition_name,
+            'description': self.description,
+            'client_account_id': self.client_account_id or self.reference_account_id,
+            'filter_conditions': self.get_filter_conditions(),
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'created_by': self.created_by
+        }

@@ -60,10 +60,35 @@
       <section id="content">
         {% if active_section == 'dashboard' %}
         <div class="card" id="dashboard">
-          <h2 style="margin:0 0 16px">Priority Accounts Dashboard</h2>
-          <p style="margin:0 0 20px;color:var(--muted)">
-            User ID: {{ user_id }} | Total Conditions: {{ total_conditions }} | Total Accounts: {{ total_accounts }}
-          </p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div>
+              <h2 style="margin:0 0 8px">Priority Accounts Dashboard</h2>
+              <p style="margin:0;color:var(--muted);font-size:14px;">
+                User ID: {{ user_id }} | Total Conditions: {{ total_conditions }} | Total Accounts: {{ total_accounts }}
+              </p>
+            </div>
+            <button onclick="openCreateRuleModal()" style="padding:10px 20px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Create New Rule
+            </button>
+          </div>
+          
+          <!-- Priority Rules Section -->
+          <div style="margin-bottom:32px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h3 style="margin:0;font-size:16px;">Your Priority Rules</h3>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;background:#f8f9fa;border-radius:6px;font-size:13px;">
+                <input type="checkbox" id="showInactiveRules" onchange="loadPriorityRules()" style="width:16px;height:16px;cursor:pointer;">
+                <span>Show Inactive Rules</span>
+              </label>
+            </div>
+            <div id="rulesContainer" style="display:flex;flex-wrap:wrap;gap:16px;min-height:100px;">
+              <p style="color:var(--muted);text-align:center;padding:20px;width:100%;">Loading rules...</p>
+            </div>
+          </div>
           
           {% if accounts %}
           <div style="overflow-x:auto;">
@@ -157,6 +182,64 @@
         {% endif %}
       </section>
     </main>
+  </div>
+
+  <!-- Create Rule Modal -->
+  <div id="createRuleModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="margin:0;font-size:20px;">Create New Priority Rule</h3>
+        <button onclick="closeCreateRuleModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);">&times;</button>
+      </div>
+      
+      <form id="createRuleForm" onsubmit="handleCreateRule(event)">
+        <div style="margin-bottom:16px;">
+          <label style="display:block;margin-bottom:6px;font-weight:500;font-size:14px;">Rule Name</label>
+          <input type="text" id="ruleName" required style="width:100%;padding:10px;border:1px solid #dee2e6;border-radius:6px;font-size:14px;">
+        </div>
+        
+        <div style="margin-bottom:16px;">
+          <label style="display:block;margin-bottom:6px;font-weight:500;font-size:14px;">Description</label>
+          <textarea id="ruleDescription" rows="2" style="width:100%;padding:10px;border:1px solid #dee2e6;border-radius:6px;font-size:14px;resize:vertical;"></textarea>
+        </div>
+        
+        <div id="ruleStatusToggle" style="margin-bottom:16px;display:none;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="ruleIsActive" checked style="width:18px;height:18px;cursor:pointer;">
+            <span style="font-weight:500;font-size:14px;">Rule is Active</span>
+          </label>
+          <small style="color:var(--muted);font-size:12px;display:block;margin-top:4px;">Inactive rules will not be applied to accounts</small>
+        </div>
+        
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <label style="font-weight:500;font-size:14px;">Filter Conditions</label>
+            <button type="button" onclick="addCondition()" style="padding:6px 12px;background:var(--accent);color:white;border:none;border-radius:4px;font-size:12px;cursor:pointer;">
+              + Add Condition
+            </button>
+          </div>
+          
+          <div id="conditionsContainer" style="display:flex;flex-direction:column;gap:12px;">
+            <!-- Conditions will be added here dynamically -->
+          </div>
+          <small style="color:var(--muted);font-size:12px;margin-top:8px;display:block;">Add one or more conditions to filter accounts. All conditions must match (AND logic).</small>
+        </div>
+        
+        <div style="display:flex;gap:12px;justify-content:space-between;margin-top:24px;">
+          <button type="button" id="deleteRuleBtn" onclick="deleteCurrentRule()" style="padding:10px 20px;background:#dc3545;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;display:none;">
+            Delete Rule
+          </button>
+          <div style="display:flex;gap:12px;margin-left:auto;">
+            <button type="button" onclick="closeCreateRuleModal()" style="padding:10px 20px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;font-size:14px;cursor:pointer;">
+              Cancel
+            </button>
+            <button type="submit" style="padding:10px 20px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;">
+              Create Rule
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>

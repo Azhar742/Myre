@@ -19,6 +19,9 @@ class Account(db.Model):
 
     last_meaningful_interaction = db.Column(db.DateTime, nullable=True)
     account_status = db.Column(db.String(50), default='active')
+    
+    # CSM user who manages this account
+    csm_user_id = db.Column(db.Integer, nullable=True)
 
     company_name = db.Column(db.String(150), nullable=True)
     domain = db.Column(db.String(150), nullable=True)

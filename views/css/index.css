@@ -68,8 +68,36 @@ nav{display:flex;flex-direction:column;gap:6px}
 @media (max-width:800px){
   .sidebar{position:fixed;left:-320px;top:0;bottom:0;z-index:40;height:100vh}
   .sidebar.open{left:0}
-  .main{padding:16px}
   .hamburger{display:inline-flex}
 }
 .hamburger{display:none;align-items:center;gap:8px;padding:8px;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
 .hamburger .bar{width:18px;height:2px;background:currentColor;border-radius:2px}
+
+/* Rule Box Styles */
+.rule-box {
+  background: white;
+  border: 2px solid #28a745;
+  padding: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 250px;
+  max-width: 300px;
+  flex: 1 1 250px;
+}
+
+.rule-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.rule-box.inactive {
+  background: #f8f9fa;
+  border-color: #dc3545;
+  opacity: 0.7;
+}
+
+/* Add any additional styles here */
+button:hover{opacity:0.9;transform:translateY(-1px);transition:all 0.2s}
+button:active{transform:translateY(0)}

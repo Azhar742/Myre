@@ -61,6 +61,7 @@ def create_priority_condition_service(account_id, data):
         condition_name=data['condition_name'],
         description=data.get('description'),
         reference_account_id=account_id,
+        client_account_id=data.get('client_account_id', account_id),
         is_active=data.get('is_active', True),
         created_by=data.get('created_by')
     )
@@ -100,9 +101,10 @@ def get_priority_conditions_by_user_service(user_id):
 def get_accounts_by_user_priority_conditions_service(user_id):
     """
     Get all accounts that match ANY priority condition created by a specific user.
+    Only returns accounts assigned to this CSM user.
     
     Args:
-        user_id: ID of the user who created the conditions
+        user_id: ID of the CSM user who created the conditions
         
     Returns:
         Dictionary with conditions and their matching accounts
@@ -123,8 +125,8 @@ def get_accounts_by_user_priority_conditions_service(user_id):
     all_account_ids = set()
     
     for condition in conditions:
-        # Get accounts matching this condition
-        accounts = get_priority_accounts_service(condition.id)
+        # Get accounts matching this condition AND assigned to this user
+        accounts = get_priority_accounts_service(condition.id, user_id)
         
         if accounts:
             account_ids = [acc.id for acc in accounts]
@@ -139,8 +141,11 @@ def get_accounts_by_user_priority_conditions_service(user_id):
                 'matching_account_ids': account_ids
             })
     
-    # Get unique accounts
-    unique_accounts = Account.query.filter(Account.id.in_(all_account_ids)).all() if all_account_ids else []
+    # Get unique accounts assigned to this user
+    unique_accounts = Account.query.filter(
+        Account.id.in_(all_account_ids),
+        Account.csm_user_id == user_id
+    ).all() if all_account_ids else []
     
     result['total_unique_accounts'] = len(unique_accounts)
     result['accounts'] = unique_accounts
@@ -159,12 +164,13 @@ def delete_priority_condition_service(condition_id):
     return True
 
 
-def get_priority_accounts_service(condition_id):
+def get_priority_accounts_service(condition_id, user_id=None):
     """
     Get all accounts that match the filter conditions of a priority condition.
     
     Args:
         condition_id: ID of the priority condition
+        user_id: Optional - filter accounts by CSM user ID
         
     Returns:
         List of Account objects matching all conditions, or None if condition not found
@@ -176,8 +182,10 @@ def get_priority_accounts_service(condition_id):
     # Get the filter conditions
     filter_conditions = condition.get_filter_conditions()
     
-    # Start with all accounts
+    # Start with all accounts, optionally filtered by user
     query = Account.query
+    if user_id is not None:
+        query = query.filter(Account.csm_user_id == user_id)
     
     # Apply each filter condition
     for field_name, condition_rule in filter_conditions.items():
