@@ -1,3 +1,8 @@
+Home Endpoint:
+    1. home:
+    curl -X GET http://localhost:5000/
+
+
 User Endpoints: 
     1. create user:
     curl -X POST http://localhost:5000/users \
@@ -62,18 +67,15 @@ Account Endpoints:
     4. delete account:
     curl -X DELETE http://localhost:5000/accounts/1
 
-    5. get all available account fields:
-    curl -X GET http://localhost:5000/accounts/fields
-
-    6. get populated fields for specific account:
+    5. get populated fields for specific account:
     curl -X GET http://localhost:5000/accounts/1/fields
-
-    7. get available filter fields for account (priority condition):
-    curl -X GET http://localhost:5000/priority_condition/1
 
 
 Priority Condition Endpoints:
-    1. create priority condition with filter rules (High Value Active):
+    1. get available filter fields for account (priority condition):
+    curl -X GET http://localhost:5000/priority_condition/1
+
+    2. create priority condition with filter rules (High Value Active):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -86,10 +88,10 @@ Priority Condition Endpoints:
     "created_by": 1
   }'
 
-    2. get accounts matching condition 1 (High Value Active):
+    3. get accounts matching condition 1 (High Value Active):
     curl -X GET http://localhost:5000/priority_accounts/1
 
-    3. create priority condition (Enterprise plan only):
+    4. create priority condition (Enterprise plan only):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -99,10 +101,10 @@ Priority Condition Endpoints:
     }
   }'
 
-    4. get accounts matching condition 2 (Enterprise):
+    5. get accounts matching condition 2 (Enterprise):
     curl -X GET http://localhost:5000/priority_accounts/2
 
-    5. create priority condition (Low bill amount):
+    6. create priority condition (Low bill amount):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -113,7 +115,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    6. create priority condition (Multiple conditions):
+    7. create priority condition (Multiple conditions):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -126,7 +128,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    7. create priority condition (Suspended accounts):
+    8. create priority condition (Suspended accounts):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
@@ -136,7 +138,7 @@ Priority Condition Endpoints:
     }
   }'
 
-    8. create priority condition (Pro or Enterprise plans):
+    9. create priority condition (Pro or Enterprise plans):
     curl -X POST http://localhost:5000/priority_condition/1 \
   -H "Content-Type: application/json" \
   -d '{
