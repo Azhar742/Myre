@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CSM — Dashboard</title>
+  <title>Churn Management — Myre CSM</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/apple_theme.css') }}">
 </head>
@@ -22,9 +22,14 @@
           <span>Dashboard</span>
         </a>
 
-        <a class="menu-item {% if active_section == 'priority' %}active{% endif %}" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
+        <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
           <span class="icon" aria-hidden>⭐</span>
           <span>Priority Accounts</span>
+        </a>
+
+        <a class="menu-item {% if active_section == 'churn' %}active{% endif %}" href="/churn_management/{{ user_id }}" role="link">
+          <span class="icon" aria-hidden>📉</span>
+          <span>Churn Management</span>
         </a>
 
         <a class="menu-item {% if active_section == 'accounts' %}active{% endif %}" href="/account_management_dashboard/{{ user_id }}" role="link">
@@ -69,13 +74,12 @@
       </div>
 
       <section id="content">
-        {% if active_section == 'dashboard' %}
         <div class="card" id="dashboard">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div>
-              <h2 style="margin:0 0 8px">Priority Accounts Dashboard</h2>
+              <h2 style="margin:0 0 8px">Churn Risk Management</h2>
               <p style="margin:0;color:var(--muted);font-size:14px;">
-                User ID: {{ user_id }} | Total Conditions: {{ total_conditions }} | Total Accounts: {{ total_accounts }}
+                User ID: {{ user_id }} | Total Churn Rules: {{ total_conditions }} | At-Risk Accounts: {{ total_accounts }}
               </p>
             </div>
             <button onclick="openCreateRuleModal()" style="padding:10px 20px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;">
@@ -83,14 +87,14 @@
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
-              Create New Rule
+              Create Churn Rule
             </button>
           </div>
           
-          <!-- Priority Rules Section -->
+          <!-- Churn Rules Section -->
           <div style="margin-bottom:32px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 style="margin:0;font-size:16px;">Your Priority Rules</h3>
+              <h3 style="margin:0;font-size:16px;">Your Churn Risk Rules</h3>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;background:#f8f9fa;border-radius:6px;font-size:13px;">
                 <input type="checkbox" id="showInactiveRules" onchange="loadPriorityRules()" style="width:16px;height:16px;cursor:pointer;">
                 <span>Show Inactive Rules</span>
@@ -157,59 +161,18 @@
             </table>
           </div>
           {% else %}
-          <p style="color:var(--muted);text-align:center;padding:40px 0;">No priority accounts found for this user.</p>
+          <p style="color:var(--muted);text-align:center;padding:40px 0;">No at-risk accounts found. Create churn rules to identify accounts at risk of churning.</p>
           {% endif %}
         </div>
-        {% endif %}
-
-        {% if active_section == 'accounts' %}
-        <div class="card" id="accounts">
-          <h2 style="margin:0 0 16px">Priority Conditions</h2>
-          {% if conditions %}
-          <div style="display:flex;flex-direction:column;gap:16px;">
-            {% for condition in conditions %}
-            <div style="padding:16px;background:#f8f9fa;border-radius:8px;border-left:4px solid var(--accent);">
-              <h3 style="margin:0 0 8px;font-size:16px;">{{ condition.condition_name }}</h3>
-              <p style="margin:0 0 12px;color:var(--muted);font-size:13px;">{{ condition.description or 'No description' }}</p>
-              <div style="display:flex;gap:20px;font-size:13px;">
-                <div><strong>Condition ID:</strong> {{ condition.condition_id }}</div>
-                <div><strong>Matching Accounts:</strong> {{ condition.matching_accounts_count }}</div>
-              </div>
-              <details style="margin-top:12px;">
-                <summary style="cursor:pointer;color:var(--accent);font-size:13px;">View Filter Conditions</summary>
-                <pre style="margin:8px 0 0;padding:12px;background:#fff;border-radius:4px;font-size:12px;overflow-x:auto;">{{ condition.filter_conditions|tojson(indent=2) }}</pre>
-              </details>
-            </div>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p style="color:var(--muted);">No conditions found.</p>
-          {% endif %}
-        </div>
-        {% endif %}
-
-        {% if active_section == 'automation' %}
-        <div class="card" id="automation">
-          <h2 style="margin:0 0 8px">Automation</h2>
-          <p style="margin:0;color:var(--muted)">Workflows, triggers and campaign automation.</p>
-        </div>
-        {% endif %}
-
-        {% if active_section == 'integration' %}
-        <div class="card" id="integration">
-          <h2 style="margin:0 0 8px">Integration</h2>
-          <p style="margin:0;color:var(--muted)">Connect third-party services and APIs.</p>
-        </div>
-        {% endif %}
       </section>
     </main>
   </div>
 
   <!-- Create Rule Modal -->
   <div id="createRuleModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-    <div style="background:white;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;">
+    <div style="background:white;border-radius:12px;padding:24px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h3 style="margin:0;font-size:20px;">Create New Priority Rule</h3>
+        <h3 style="margin:0;font-size:20px;">Create New Churn Rule</h3>
         <button onclick="closeCreateRuleModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);">&times;</button>
       </div>
       
@@ -271,7 +234,6 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
   <script>
     // Logout function
     function logout() {
@@ -397,7 +359,210 @@
           showAccountDetails(accountId);
         });
       });
+      
+      // Load churn rules on page load
+      loadChurnRules();
     });
+
+    // Open create rule modal
+    function openCreateRuleModal() {
+      document.getElementById('createRuleModal').style.display = 'flex';
+      document.getElementById('ruleName').value = '';
+      document.getElementById('ruleDescription').value = '';
+      document.getElementById('conditionsContainer').innerHTML = '';
+      addCondition(); // Add first condition by default
+    }
+    
+    // Close create rule modal
+    function closeCreateRuleModal() {
+      document.getElementById('createRuleModal').style.display = 'none';
+    }
+    
+    // Account columns for dropdown
+    const accountColumns = [
+      { value: 'account_name', label: 'Account Name' },
+      { value: 'account_status', label: 'Account Status' },
+      { value: 'plan_name', label: 'Plan Name' },
+      { value: 'client_email', label: 'Client Email' },
+      { value: 'client_phn', label: 'Client Phone' },
+      { value: 'last_paid_bill_amount', label: 'Last Paid Bill Amount' },
+      { value: 'company_name', label: 'Company Name' },
+      { value: 'domain', label: 'Domain' },
+      { value: 'last_login', label: 'Last Login' },
+      { value: 'last_meaningful_interaction', label: 'Last Meaningful Interaction' }
+    ];
+
+    // Operators for different data types
+    const operators = [
+      { value: '==', label: 'Equal to' },
+      { value: '!=', label: 'Not equal to' },
+      { value: '>', label: 'Greater than' },
+      { value: '<', label: 'Less than' },
+      { value: '>=', label: 'Greater than or equal to' },
+      { value: '<=', label: 'Less than or equal to' },
+      { value: 'contains', label: 'Contains' },
+      { value: 'not_contains', label: 'Does not contain' },
+      { value: 'in', label: 'In' },
+      { value: 'not_in', label: 'Not in' },
+      { value: 'is_empty', label: 'Is empty' },
+      { value: 'is_not_empty', label: 'Is not empty' },
+      { value: 'exists', label: 'Exists' },
+      { value: 'not_exists', label: 'Does not exist' }
+    ];
+    
+    // Add condition to form (only one allowed)
+    let conditionCount = 0;
+    function addCondition() {
+      const container = document.getElementById('conditionsContainer');
+      
+      // Only allow one condition - clear any existing
+      container.innerHTML = '';
+      
+      conditionCount++;
+      const conditionHtml = `
+        <div class="condition-row" id="condition-${conditionCount}" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;">
+          <div>
+            <select class="field-select" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:4px;font-size:13px;">
+              <option value="">Select Field</option>
+              ${accountColumns.map(col => `<option value="${col.value}">${col.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <select class="operator-select" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:4px;font-size:13px;">
+              <option value="">Select Operator</option>
+              ${operators.map(op => `<option value="${op.value}">${op.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <input type="text" class="value-input" placeholder="Value" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:4px;font-size:13px;">
+            <small style="color:var(--muted);font-size:11px;display:block;margin-top:4px;">Leave empty for 'is empty' or 'exists' operators</small>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', conditionHtml);
+    }
+    
+    // Handle create rule form submission
+    async function handleCreateRule(event) {
+      event.preventDefault();
+      
+      const ruleName = document.getElementById('ruleName').value;
+      const ruleDescription = document.getElementById('ruleDescription').value;
+      
+      // Get all conditions
+      const conditions = [];
+      document.querySelectorAll('.condition-row').forEach(row => {
+        const field = row.querySelector('.field-select').value;
+        const operator = row.querySelector('.operator-select').value;
+        const value = row.querySelector('.value-input').value;
+        
+        if (field && operator && value) {
+          conditions.push({ field_name: field, operator: operator, field_value: value });
+        }
+      });
+      
+      if (conditions.length === 0) {
+        alert('Please add at least one condition');
+        return;
+      }
+      
+      // For now, only support single condition
+      const condition = conditions[0];
+      
+      const userId = {{ user_id }};
+      try {
+        const response = await fetch('/churn_conditions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            condition_name: ruleName,
+            condition_description: ruleDescription,
+            field_name: condition.field_name,
+            operator: condition.operator,
+            field_value: condition.field_value
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+          alert('Churn rule created successfully!');
+          closeCreateRuleModal();
+          location.reload();
+        } else {
+          alert('Failed to create churn rule: ' + (result.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error creating churn rule:', error);
+        alert('Error creating churn rule');
+      }
+    }
+
+    // Load churn rules
+    async function loadChurnRules() {
+      const userId = {{ user_id }};
+      try {
+        const response = await fetch(`/churn_conditions/${userId}`);
+        const conditions = await response.json();
+        
+        const container = document.getElementById('rulesContainer');
+        if (!conditions || conditions.length === 0) {
+          container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px;width:100%;">No churn rules created yet. Click "Create Churn Rule" to get started.</p>';
+          return;
+        }
+        
+        container.innerHTML = conditions.map(condition => `
+          <div class="rule-box-item" 
+               style="background:white;border:2px solid #28a745;color:#212529;padding:12px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.1);min-width:200px;max-width:280px;flex:1 1 200px;position:relative;" 
+               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)';this.querySelector('.delete-x').style.opacity='1';"
+               onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)';this.querySelector('.delete-x').style.opacity='0';">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;">${condition.condition_name}</span>
+              <button class="delete-x" onclick="event.stopPropagation();deleteChurnRule(${condition.id})" 
+                      style="opacity:0;transition:opacity 0.2s;background:transparent;border:none;color:#dc3545;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:4px;"
+                      onmouseover="this.style.background='#dc3545';this.style.color='white';"
+                      onmouseout="this.style.background='transparent';this.style.color='#dc3545';">
+                ×
+              </button>
+            </div>
+            <div style="font-size:12px;color:#6c757d;margin-top:4px;font-family:monospace;">
+              ${condition.field_name} ${condition.operator} ${condition.field_value}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading churn rules:', error);
+        document.getElementById('rulesContainer').innerHTML = '<p style="color:#dc3545;text-align:center;padding:20px;width:100%;">Error loading churn rules</p>';
+      }
+    }
+
+    // Delete churn rule
+    async function deleteChurnRule(conditionId) {
+      if (!confirm('Are you sure you want to delete this churn rule?')) {
+        return;
+      }
+      
+      const userId = {{ user_id }};
+      try {
+        const response = await fetch(`/churn_conditions/${conditionId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId })
+        });
+        
+        if (response.ok) {
+          alert('Churn rule deleted successfully');
+          loadChurnRules();
+          location.reload();
+        } else {
+          alert('Failed to delete churn rule');
+        }
+      } catch (error) {
+        console.error('Error deleting churn rule:', error);
+        alert('Error deleting churn rule');
+      }
+    }
   </script>
 </body>
 </html>

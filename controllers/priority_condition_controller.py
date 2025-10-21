@@ -190,6 +190,7 @@ def get_priority_accounts_service(condition_id, user_id=None):
     # Apply each filter condition
     for field_name, condition_rule in filter_conditions.items():
         if not hasattr(Account, field_name):
+            print(f"WARNING: Account model does not have field '{field_name}'")
             continue
         
         column = getattr(Account, field_name)
@@ -207,7 +208,11 @@ def get_priority_accounts_service(condition_id, user_id=None):
         
         # Apply the operator with null handling
         if operator == '==':
-            query = query.filter(column == value)
+            # For string columns, use case-insensitive comparison
+            if isinstance(value, str):
+                query = query.filter(db.func.lower(column) == value.lower())
+            else:
+                query = query.filter(column == value)
         elif operator == '!=':
             query = query.filter(column != value)
         elif operator == '>':

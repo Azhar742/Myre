@@ -84,14 +84,18 @@ function deleteCurrentRule() {
   }
 }
 
-// Add a new condition row
+// Add a new condition row (only one allowed)
 function addCondition() {
   const container = document.getElementById('conditionsContainer');
+  
+  // Only allow one condition - clear any existing
+  container.innerHTML = '';
+  
   const conditionId = conditionCounter++;
   
   const conditionRow = document.createElement('div');
   conditionRow.id = `condition-${conditionId}`;
-  conditionRow.style.cssText = 'display:grid;grid-template-columns:2fr 2fr 2fr auto;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;align-items:start;';
+  conditionRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px;background:#f8f9fa;border-radius:6px;align-items:start;';
   
   conditionRow.innerHTML = `
     <div>
@@ -112,10 +116,6 @@ function addCondition() {
       <input type="text" class="condition-value" data-id="${conditionId}" placeholder="Value" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:4px;font-size:13px;">
       <small style="color:var(--muted);font-size:11px;display:block;margin-top:4px;">Leave empty for 'is empty' or 'exists' operators</small>
     </div>
-    
-    <button type="button" onclick="removeCondition(${conditionId})" style="padding:8px 12px;background:#dc3545;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">
-      Remove
-    </button>
   `;
   
   container.appendChild(conditionRow);
@@ -311,6 +311,16 @@ async function loadPriorityRules() {
         ? 'background:white;border:2px solid #28a745;color:#212529;'
         : 'background:#f8f9fa;border:2px solid #dc3545;color:#6c757d;opacity:0.7;';
       
+      // Format filter conditions for display
+      let conditionsText = '';
+      if (rule.filter_conditions && typeof rule.filter_conditions === 'object') {
+        // filter_conditions is a dictionary: { "field_name": {"operator": "==", "value": "active"} }
+        const conditions = Object.entries(rule.filter_conditions).map(([field, condition]) => 
+          `${field} ${condition.operator} ${condition.value}`
+        );
+        conditionsText = conditions.join(' AND ');
+      }
+      
       boxesHTML += `
         <div class="rule-box-item" onclick="editRule(${rule.id})" 
              style="${boxStyle}padding:12px 16px;border-radius:8px;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.1);min-width:200px;max-width:280px;flex:1 1 200px;position:relative;" 
@@ -325,6 +335,7 @@ async function loadPriorityRules() {
               ×
             </button>
           </div>
+          ${conditionsText ? `<div style="font-size:12px;color:#6c757d;margin-top:4px;font-family:monospace;">${conditionsText}</div>` : ''}
         </div>
       `;
     });
