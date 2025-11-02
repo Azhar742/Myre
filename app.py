@@ -8,7 +8,7 @@ from sqlalchemy import inspect
 load_dotenv()
 # Initialize Flask app first
 app = Flask(__name__, template_folder='views', static_folder='views', static_url_path='/static')
-
+app.secret_key = os.environ.get('SECRET_KEY') or os.urandom(24)
 # Database Configuration
 # Use DATABASE_URL from environment (for Supabase/PostgreSQL)
 # Falls back to SQLite for local development
