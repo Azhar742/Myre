@@ -1,7 +1,11 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from functools import wraps
 import os
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
+from dotenv import load_dotenv
+from sqlalchemy import inspect
 
+load_dotenv()
 # Initialize Flask app first
 app = Flask(__name__, template_folder='views', static_folder='views', static_url_path='/static')
 
@@ -9,20 +13,35 @@ app = Flask(__name__, template_folder='views', static_folder='views', static_url
 # Use DATABASE_URL from environment (for Supabase/PostgreSQL)
 # Falls back to SQLite for local development
 basedir = os.path.abspath(os.path.dirname(__file__))
-database_url = os.environ.get('DATABASE_URL')
+
+database_url = os.environ.get('DATABASE_URL') or os.environ.get('DIRECT_URL')
 
 if database_url:
-    # Production: Use PostgreSQL from environment variable (Supabase)
+    # Normalize URL for SQLAlchemy: some providers return 'postgres://' which SQLAlchemy warns about
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+    # Ensure sslmode=require is present in query params
+    parsed = urlparse(database_url)
+    query = dict(parse_qsl(parsed.query))
+    
+    query.pop('pgbouncer', None)
+
+    if 'sslmode' not in query:
+        query['sslmode'] = 'require'
+    new_query = urlencode(query)
+    parsed = parsed._replace(query=new_query)
+    database_url = urlunparse(parsed)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    print(f"Using database: {database_url.split('@')[1] if '@' in database_url else 'PostgreSQL'}")
+    # Provide engine options so SQLAlchemy/psycopg2 enforces SSL
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'connect_args': {'sslmode': 'require'}}
+    host_info = f"{parsed.hostname}:{parsed.port}" if parsed.hostname else "PostgreSQL"
+    print(f"Using database: {host_info}/{parsed.path.lstrip('/')}")
 else:
-    # Development: Use SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "mydatabase.db")}'
-    print(f"Using database: SQLite (mydatabase.db)")
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-
+    # Fallback to local SQLite database
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
+    print("Using local SQLite database")
 # Import db and initialize it
 from models.user_model import db, User
 db.init_app(app)
@@ -180,7 +199,17 @@ def validate_user_exists(f):
     return decorated_function
 
 
+
 # --- Routes ---
+
+@app.route('/__debug/db_tables', methods=['GET'])
+def debug_db_tables():
+    from flask import abort
+    # protect endpoint in production
+    if not app.debug:
+        return abort(404)
+    inspector = inspect(db.engine)
+    return jsonify({'tables': inspector.get_table_names()})
 
 @app.route('/', methods=['GET'])
 def home():

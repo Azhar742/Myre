@@ -1,0 +1,15 @@
+# use the below lines to test db connection:
+
+python - <<'PY'
+from dotenv import load_dotenv
+import os
+from sqlalchemy import create_engine, text
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+load_dotenv()
+url = os.getenv("DATABASE_URL") or os.getenv("DIRECT_URL")
+p = urlparse(url); q = dict(parse_qsl(p.query)); q.pop('pgbouncer', None)
+if 'sslmode' not in q: q['sslmode']='require'
+p = p._replace(query=urlencode(q)); clean=urlunparse(p)
+engine = create_engine(clean, connect_args={"sslmode":"require"})
+with engine.connect() as conn: print(conn.execute(text("SELECT 1")).scalar())
+PY
