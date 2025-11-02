@@ -4,9 +4,22 @@ import os
 
 # Initialize Flask app first
 app = Flask(__name__, template_folder='views', static_folder='views', static_url_path='/static')
-# Use absolute path to ensure database is in project root
+
+# Database Configuration
+# Use DATABASE_URL from environment (for Supabase/PostgreSQL)
+# Falls back to SQLite for local development
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "mydatabase.db")}'
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # Production: Use PostgreSQL from environment variable (Supabase)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    print(f"Using database: {database_url.split('@')[1] if '@' in database_url else 'PostgreSQL'}")
+else:
+    # Development: Use SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "mydatabase.db")}'
+    print(f"Using database: SQLite (mydatabase.db)")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
