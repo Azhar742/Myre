@@ -11,48 +11,7 @@
 <body>
   <div class="app" id="app">
     <aside class="sidebar" id="sidebar" aria-label="Main menu">
-      <div class="brand">
-        <div class="logo">CSM</div>
-        <div>Myre CSM</div>
-      </div>
-
-      <nav role="navigation" aria-label="Primary">
-        <a class="menu-item active" href="/dashboard/{{ user_id }}" role="link">
-          <span class="icon" aria-hidden>🏠</span>
-          <span>Dashboard</span>
-        </a>
-
-        <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
-          <span class="icon" aria-hidden>⭐</span>
-          <span>Priority Accounts</span>
-        </a>
-
-        <a class="menu-item" href="/account_management_dashboard/{{ user_id }}" role="link">
-          <span class="icon" aria-hidden>👥</span>
-          <span>Account Management</span>
-        </a>
-
-        <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}/automation" role="link">
-          <span class="icon" aria-hidden>⚙️</span>
-          <span>Automation</span>
-        </a>
-
-        <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}/integration" role="link">
-          <span class="icon" aria-hidden>🔗</span>
-          <span>Integration</span>
-        </a>
-      </nav>
-
-      <div class="spacer" aria-hidden></div>
-
-      <div style="font-size:13px;color:rgba(255,255,255,0.75);padding:16px 0">
-        v1.0 • <span style="color:var(--muted)">Signed in as</span><br/><strong>{{ user_email or 'user@example.com' }}</strong>
-      </div>
-
-      <a class="menu-item" href="#" onclick="logout(); return false;" role="link" style="color:#ff6b6b;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px">
-        <span class="icon" aria-hidden>🚪</span>
-        <span>Logout</span>
-      </a>
+      {% include 'html/sidebar.html' %}
     </aside>
 
     <main class="main" id="main">
@@ -200,136 +159,22 @@
     </main>
   </div>
 
-  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
   <script>
-    // Logout function
-    function logout() {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.replace('/');
-    }
-
-    // Data from backend
-    // eslint-disable-next-line
-    const totalAccounts = {{ total_accounts or 0 }};
-    // eslint-disable-next-line
-    const activeAccounts = {{ active_accounts or 0 }};
-    const inactiveAccounts = totalAccounts - activeAccounts;
-
-    // Chart.js configurations
-    const chartColors = {
-      primary: '#0071e3',
-      success: '#30d158',
-      warning: '#ff9f0a',
-      danger: '#ff3b30',
-      gray: '#86868b'
-    };
-
-    // Account Growth Chart (Line)
-    const accountGrowthCtx = document.getElementById('accountGrowthChart').getContext('2d');
-    new Chart(accountGrowthCtx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-        datasets: [{
-          label: 'Total Accounts',
-          data: [12, 19, 25, 32, 38, 45, 52, 61, 68, totalAccounts],
-          borderColor: chartColors.primary,
-          backgroundColor: 'rgba(0, 113, 227, 0.1)',
-          tension: 0.4,
-          fill: true,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
-
-    // Account Status Chart (Doughnut)
-    const accountStatusCtx = document.getElementById('accountStatusChart').getContext('2d');
-    new Chart(accountStatusCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Active', 'Inactive', 'Suspended'],
-        datasets: [{
-          data: [activeAccounts, inactiveAccounts, 2],
-          backgroundColor: [chartColors.success, chartColors.gray, chartColors.danger],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
-    });
-
-    // Revenue Trend Chart (Bar)
-    const revenueTrendCtx = document.getElementById('revenueTrendChart').getContext('2d');
-    new Chart(revenueTrendCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Revenue ($K)',
-          data: [15, 18, 20, 22, 21, 24.5],
-          backgroundColor: chartColors.primary,
-          borderRadius: 8
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
-
-    // Customer Activity Chart (Line)
-    const activityCtx = document.getElementById('activityChart').getContext('2d');
-    new Chart(activityCtx, {
-      type: 'line',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Active Users',
-          data: [45, 52, 48, 65, 58, 42, 38],
-          borderColor: chartColors.success,
-          backgroundColor: 'rgba(48, 209, 88, 0.1)',
-          tension: 0.4,
-          fill: true,
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
-          x: { grid: { display: false } }
-        }
-      }
-    });
+    const totalAccounts = {{ total_accounts | tojson }};
+    const activeAccounts = {{ active_accounts | tojson }};
+    const priorityAccounts = {{ priority_accounts | tojson }};
+    const monthlyAccounts = {{ monthly_accounts | tojson }};
+    const monthlyRevenue = {{ monthly_revenue | tojson }};
+    const weeklyActivity = {{ weekly_activity | tojson }};
+    // Example for account status: active, inactive, suspended
+    const accountStatusData = [activeAccounts, totalAccounts - activeAccounts, 2];
+    // Example for recent activity (replace with real data from backend if available)
+    const recentActivity = [
+      { user: 'JD', type: 'New account created', detail: 'TechStart Inc joined 2 hours ago', time: '2h ago' },
+      { user: 'GS', type: 'Payment received', detail: 'Global Solutions paid $5,000', time: '5h ago' },
+      { user: 'DV', type: 'Support ticket created', detail: 'Digital Ventures needs assistance', time: '1d ago' }
+    ];
   </script>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>

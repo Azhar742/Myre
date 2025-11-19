@@ -7,6 +7,7 @@ def create_account_service(data):
         account_name=data['account_name'],
         account_id=data['account_id'],
         client_account_id=data['client_account_id'],
+        created_at=data.get('created_at') or datetime.utcnow(),
         client_email=data.get('client_email'),
         client_phn=data.get('client_phn'),
         last_paid_bill_amount=data.get('last_paid_bill_amount'),

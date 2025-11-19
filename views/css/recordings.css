@@ -1,0 +1,3 @@
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; }
+.centered { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
+h1 { font-size: 2.5rem; color: #222; }

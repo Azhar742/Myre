@@ -41,7 +41,15 @@ async function handleSignup(event) {
         const data = await response.json();
 
         if (!response.ok) {
-            alert(data.error || 'Signup failed');
+            // Check if this is an organization validation issue
+            if (response.status === 403 && data.redirect_to) {
+                if (confirm(data.error + '\n\nWould you like to register your organization now?')) {
+                    window.location.href = data.redirect_to;
+                    return;
+                }
+            } else {
+                alert(data.error || 'Signup failed');
+            }
             return;
         }
 

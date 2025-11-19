@@ -78,19 +78,18 @@
                 <div class="limit-info" id="limitsInfo">
                     <div class="limit-item">
                         <span class="limit-label">Current Users:</span>
-                        <span class="limit-value" id="currentUsers">-</span>
                     </div>
-                    <div class="limit-item" id="maxUsersItem">
                         <span class="limit-label">Maximum Users:</span>
                         <span class="limit-value" id="maxUsers">-</span>
                     </div>
+                    <aside class="sidebar" id="sidebar" aria-label="Main menu">
+                        {% include 'html/sidebar.html' %}
+                    </aside>
                     <div class="limit-item" id="availableSlotsItem">
                         <span class="limit-label">Available Slots:</span>
                         <span class="limit-value" id="availableSlots">-</span>
                     </div>
-                </div>
                 
-                <div class="plan-info">
                     <p><strong>Current Plan:</strong> <span id="currentPlan">-</span></p>
                     <p class="upgrade-text">Need more users? <a href="#" onclick="upgradePlan()">Upgrade your plan</a></p>
                 </div>

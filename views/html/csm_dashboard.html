@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CSM Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/csm_dashboard.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/apple_theme.css') }}">
 </head>
 <body>
-  <div class="dashboard-container">
+  <aside class="sidebar" id="sidebar" aria-label="Main menu">
+  {% include 'html/sidebar.html' %}
+  </aside>
     <!-- Header -->
     <header class="header">
       <div class="header-left">
         <div class="logo">
           <div class="logo-icon">CSM</div>
-          <span class="logo-text">Myre CSM</span>
+{{ ... }}
         </div>
       </div>
       <div class="header-right">
@@ -91,23 +92,6 @@
           <div class="card-arrow">→</div>
         </a>
 
-        <!-- Integration Card -->
-        <a href="/priority_accounts_dashboard/{{ user_id }}/integration" class="dashboard-card">
-          <div class="card-icon integration-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-          </div>
-          <div class="card-content">
-            <h2 class="card-title">Integration</h2>
-            <p class="card-description">Connect third-party services and manage API integrations</p>
-            <div class="card-stats">
-              <span class="stat-badge">Manage Integrations</span>
-            </div>
-          </div>
-          <div class="card-arrow">→</div>
-        </a>
       </div>
 
       <!-- Quick Stats Section -->

@@ -26,6 +26,8 @@ class Account(db.Model):
     # Multi-tenant: Organization that owns this customer account
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=True, index=True)
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     company_name = db.Column(db.String(150), nullable=True)
     domain = db.Column(db.String(150), nullable=True)
     plan_name = db.Column(db.String(100), nullable=True)

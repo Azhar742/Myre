@@ -55,20 +55,18 @@
             <div class="form-container">
                 <div class="form-header">
                     <h2>Create Your Organization</h2>
-                    <p>Get started with a free account. No credit card required.</p>
                 </div>
-
                 <form id="orgSignupForm" class="signup-form">
                     <!-- Step Indicator -->
                     <div class="step-indicator">
-                        <div class="step active" data-step="1">
-                            <div class="step-number">1</div>
-                            <div class="step-label">Organization</div>
-                        </div>
+                        <aside class="sidebar" id="sidebar" aria-label="Main menu">
+                            {% include 'html/sidebar.html' %}
+                        </aside>
                         <div class="step-line"></div>
                         <div class="step" data-step="2">
                             <div class="step-number">2</div>
                             <div class="step-label">Admin Account</div>
+{{ ... }}
                         </div>
                         <div class="step-line"></div>
                         <div class="step" data-step="3">

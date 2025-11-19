@@ -68,6 +68,27 @@ body {
     padding: 20px;
 }
 
+.form-hint {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.org-notice {
+    background-color: rgba(102, 126, 234, 0.1);
+    border-left: 3px solid var(--accent-color);
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.notice-text {
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
 .auth-box {
     background: var(--bg-primary);
     padding: 48px;

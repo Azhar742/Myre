@@ -33,6 +33,9 @@ def create_fake_accounts(n=10):
                 'last_login': fake.date_time_between(start_date='-15d', end_date='now'),
                 'last_sent_email': fake.date_time_between(start_date='-7d', end_date='now')
             }
+            # Set created_at to a random date within the last 30 days
+            from datetime import datetime, timedelta
+            data['created_at'] = fake.date_time_between(start_date='-30d', end_date='now')
             create_account_service(data)
 
         print(f"{n} fake accounts added.")

@@ -1,0 +1,35 @@
+{# Sidebar partial for profile.html and dashboard.html #}
+<div class="brand">
+  <div class="logo">CSM</div>
+  <div>Myre CSM</div>
+</div>
+<nav role="navigation" aria-label="Primary">
+  <a class="menu-item" href="/dashboard/{{ user_id }}" role="link">
+    <span class="icon" aria-hidden>🏠</span>
+    <span>Dashboard</span>
+  </a>
+  <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}" role="link">
+    <span class="icon" aria-hidden>⭐</span>
+    <span>Priority Accounts</span>
+  </a>
+  <a class="menu-item" href="/account_management_dashboard/{{ user_id }}" role="link">
+    <span class="icon" aria-hidden>👥</span>
+    <span>Account Management</span>
+  </a>
+  <a class="menu-item" href="/priority_accounts_dashboard/{{ user_id }}/automation" role="link">
+    <span class="icon" aria-hidden>⚙️</span>
+    <span>Automation</span>
+  </a>
+  <a class="menu-item" href="/dashboard/{{ user_id }}/collab_insights" role="link">
+    <span class="icon" aria-hidden>🤝</span>
+    <span>Collab Insights</span>
+  </a>
+</nav>
+<div class="spacer" aria-hidden></div>
+<div style="font-size:13px;color:rgba(255,255,255,0.75);padding:16px 0">
+  v1.0 • <span style="color:var(--muted)">Signed in as</span><br/><strong>{{ user_email or 'user@example.com' }}</strong>
+</div>
+<a class="menu-item" href="#" onclick="logout(); return false;" role="link" style="color:#ff6b6b;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px">
+  <span class="icon" aria-hidden>🚪</span>
+  <span>Logout</span>
+</a>

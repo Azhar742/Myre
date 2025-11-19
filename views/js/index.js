@@ -4,6 +4,147 @@ const hamburger = document.getElementById('hamburger');
 // Toggle sidebar on mobile
 hamburger?.addEventListener('click', () => sidebar.classList.toggle('open'));
 
+// Logout function (for dashboard.html)
+window.logout = function() {
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.replace('/');
+};
+
+// Only run dashboard charts on /dashboard/<userid>
+if (window.location.pathname.match(/^\/dashboard\/\d+$/)) {
+  // Data from backend
+    // Use the values set in the HTML template directly
+  const inactiveAccounts = totalAccounts - activeAccounts;
+
+  // Chart.js configurations
+  const chartColors = {
+    primary: '#0071e3',
+    success: '#30d158',
+    warning: '#ff9f0a',
+    danger: '#ff3b30',
+    gray: '#86868b'
+  };
+
+  // Account Growth Chart (Line)
+  const agc = document.getElementById('accountGrowthChart');
+  if (agc) {
+    const accountGrowthCtx = agc.getContext('2d');
+    new Chart(accountGrowthCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+          label: 'Total Accounts',
+          data: [12, 19, 25, 32, 38, 45, 52, 61, 68, totalAccounts],
+          borderColor: chartColors.primary,
+          backgroundColor: 'rgba(0, 113, 227, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Account Status Chart (Doughnut)
+  const asc = document.getElementById('accountStatusChart');
+  if (asc) {
+    const accountStatusCtx = asc.getContext('2d');
+    new Chart(accountStatusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Active', 'Inactive', 'Suspended'],
+        datasets: [{
+          data: [activeAccounts, inactiveAccounts, 2],
+          backgroundColor: [chartColors.success, chartColors.gray, chartColors.danger],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  }
+
+  // Revenue Trend Chart (Bar)
+  const rtc = document.getElementById('revenueTrendChart');
+  if (rtc) {
+    const revenueTrendCtx = rtc.getContext('2d');
+    new Chart(revenueTrendCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Revenue ($K)',
+          data: [15, 18, 20, 22, 21, 24.5],
+          backgroundColor: chartColors.primary,
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  // Customer Activity Chart (Line)
+  const ac = document.getElementById('activityChart');
+  if (ac) {
+    const activityCtx = ac.getContext('2d');
+    new Chart(activityCtx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Active Users',
+          data: [45, 52, 48, 65, 58, 42, 38],
+          borderColor: chartColors.success,
+          backgroundColor: 'rgba(48, 209, 88, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f5f5f7' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+}
+
 // Close sidebar when clicking outside on mobile
 document.addEventListener('click', e => {
   if (window.matchMedia('(max-width:800px)').matches) {

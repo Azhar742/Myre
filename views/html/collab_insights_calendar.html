@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Collab Insights | Calendar</title>
+    <script>
+        async function fetchEvents() {
+            const res = await fetch('/google_calendar/events');
+            const events = await res.json();
+            const list = document.getElementById('events-list');
+            list.innerHTML = '';
+            if (events.length === 0) {
+                list.innerHTML = '<li>No events found.</li>';
+            } else {
+                events.forEach(event => {
+                    const li = document.createElement('li');
+                    li.textContent = `${event.summary || '(No Title)'}: ${event.start.dateTime || event.start.date}`;
+                    list.appendChild(li);
+                });
+            }
+        }
+        async function createEvent() {
+            const summary = document.getElementById('summary').value;
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+            const attendees = document.getElementById('attendees').value.split(',').map(e => e.trim()).filter(e => e);
+            const res = await fetch('/google_calendar/create_event', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ summary, start, end, attendees })
+            });
+            if (res.ok) {
+                alert('Event created!');
+                fetchEvents();
+            } else {
+                alert('Failed to create event.');
+            }
+        }
+        window.onload = fetchEvents;
+    </script>
+</head>
+<body>
+    <h1>Collab Insights: Calendar</h1>
+    <h2>Your Google Calendar Events</h2>
+    <ul id="events-list"></ul>
+    <h2>Create New Meeting</h2>
+    <form onsubmit="event.preventDefault(); createEvent();">
+        <label>Title: <input type="text" id="summary" required></label><br>
+        <label>Start (ISO): <input type="datetime-local" id="start" required></label><br>
+        <label>End (ISO): <input type="datetime-local" id="end" required></label><br>
+        <label>Attendees (comma-separated emails): <input type="text" id="attendees"></label><br>
+        <button type="submit">Create Event</button>
+    </form>
+</body>
+</html>
